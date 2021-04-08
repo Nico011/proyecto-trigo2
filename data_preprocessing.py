@@ -4,6 +4,43 @@ import pandas
 from sklearn.preprocessing import StandardScaler
 
 
+def data_any_year(target, datos, year):
+    filtro1 = datos[datos["ANIO"] == year]
+    filtro2 = datos[datos["ANIO"] == year]
+    
+    filtro1 = filtro1[filtro1["CONDICION"] != "SECANO"]
+    filtro2 = filtro2[filtro2["CONDICION"] == "SECANO"]
+    
+    df_chl_control = filtro1.loc[ : , target]
+    df_firma_control = filtro1.loc[ : , "350":"2500"]
+    cols = list(df_firma_control.columns.values) # recuperamos los nombres de columnas
+    
+    # Estandarizar control
+    df_firma_control = pandas.DataFrame(StandardScaler().fit_transform(df_firma_control)) 
+    df_firma_control.columns = cols
+    
+    df_chl_secano = filtro2.loc[ : , target]
+    df_firma_secano = filtro2.loc[ : , "350":len(filtro2)-1]
+    
+    # Estandarizar secano
+    df_firma_secano = pandas.DataFrame(StandardScaler().fit_transform(df_firma_secano)) 
+    df_firma_secano.columns = cols
+    
+    # Unir columna a predecir con predictores
+    control = pandas.concat([df_chl_control.reset_index(drop=True), df_firma_control], axis = 1)
+    secano = pandas.concat([df_chl_secano.reset_index(drop=True), df_firma_secano], axis = 1)
+    
+    # eliminar NAs
+    control.dropna(inplace = True)
+    secano.dropna(inplace = True)
+    
+    # Reasignamos estas variables, pero ahora se eliminaron los NAs y se estandarizó
+    firma_control = control.loc[ : , "350":"2500"]
+    firma_secano = secano.loc[ : , "350":"2500"]
+    return firma_control, control, firma_secano, secano
+
+
+
 def data_2014(target, datos):
     # filtro por año (2014)------------------------------------
     filtro1_2014 = datos[datos["ANIO"] == 2014]
@@ -38,7 +75,7 @@ def data_2014(target, datos):
     # Reasignamos estas variables, pero ahora se eliminaron los NAs y se estandarizó
     firma_control_2014 = control_2014.loc[ : , "350":"2500"]
     firma_secano_2014 = secano_2014.loc[ : , "350":"2500"]
-    return
+    return firma_control_2014, control_2014
 
 def data_2015(target, datos):
     # filtro por año (2015) -----------------------------------

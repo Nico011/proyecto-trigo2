@@ -8,10 +8,11 @@ from sklearn.preprocessing import StandardScaler
 
 import scipy.cluster.hierarchy as hcluster
 
+import data_preprocessing
 import my_boruta
-import my_lasso
-import my_kbest
-import my_ga
+import lasso
+import kbest
+import ga
 
 
 def datos():
@@ -72,7 +73,7 @@ def string_to_int(lista):
 
 def main(argv):
     target = 'Chl'
-    alg = 'all'
+    alg = 'boruta'
     year = 'all'
     
     try:
@@ -94,7 +95,9 @@ def main(argv):
             
     if year != 'all':
         if alg == 'boruta':
-            
+            data = datos()
+            firma_control, control, firma_secano, secano = data_preprocessing.data_any_year(target, data, int(year))
+            my_boruta.my_boruta_init(target, firma_control, control)
             
             
     
