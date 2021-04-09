@@ -5,20 +5,32 @@ from sklearn.preprocessing import StandardScaler
 
 
 def data_any_year(target, datos, year):
+    # get data for given year
     filtro1 = datos[datos["ANIO"] == year]
     
+    # separete data sets (secano/control)
     control1 = filtro1[filtro1["CONDICION"] != "SECANO"]
     secano1 = filtro1[filtro1["CONDICION"] == "SECANO"]
     
-    df_chl_control = control1.loc[ : , target]
-    df_firma_control = control1.loc[ : , "350":"2500"]
-    cols = list(df_firma_control.columns.values) # recuperamos los nombres de columnas
+    # get target column
+    df_target_control = control1.loc[ : , target]
     
-    # Estandarizar control
-    df_firma_control = pandas.DataFrame(StandardScaler().fit_transform(df_firma_control)) 
+    # get signature columns, and column names as list
+    df_firma_control = control1.loc[ : , "350":"2500"]
+    cols = list(df_firma_control.columns.values) 
+    
+    # Standardize signature
+    # the standard score of the sample x is calculated as:
+    # z = (x - u)/s
+    # where u is the mean of the training samples,
+    # and s is the standard deviation of the training samples
+    df_firma_control = pandas.DataFrame(StandardScaler().fit_transform(df_firma_control))
+    
+    # assign column names to dataframe
     df_firma_control.columns = cols
     
-    df_chl_secano = secano1.loc[ : , target]
+    
+    df_target_secano = secano1.loc[ : , target]
     df_firma_secano = secano1.loc[ : , "350":"2500"]
     
     # Estandarizar secano
@@ -26,17 +38,17 @@ def data_any_year(target, datos, year):
     df_firma_secano.columns = cols
     
     # Unir columna a predecir con predictores
-    control = pandas.concat([df_chl_control.reset_index(drop=True), df_firma_control], axis = 1)
-    secano = pandas.concat([df_chl_secano.reset_index(drop=True), df_firma_secano], axis = 1)
+    control = pandas.concat([df_target_control.reset_index(drop=True), df_firma_control], axis = 1)
+    secano = pandas.concat([df_target_secano.reset_index(drop=True), df_firma_secano], axis = 1)
     
     # eliminar NAs
     control.dropna(inplace = True)
     secano.dropna(inplace = True)
     
     # Reasignamos estas variables, pero ahora se eliminaron los NAs y se estandarizó
-    firma_control = control.loc[ : , "350":"2500"]
-    firma_secano = secano.loc[ : , "350":"2500"]
-    return firma_control, control, firma_secano, secano
+    # firma_control = control.loc[ : , "350":"2500"]
+    # firma_secano = secano.loc[ : , "350":"2500"]
+    return control, secano
 
 
 

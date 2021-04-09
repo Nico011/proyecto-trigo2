@@ -73,8 +73,8 @@ def string_to_int(lista):
 
 def main(argv):
     target = 'Chl'
-    alg = 'boruta'
-    year = 'all'
+    alg = 'kbestmi'
+    year = '2014'
     
     try:
         opts, arg = getopt.getopt(argv, "ht:a:y:", ["target=", "algorithm=", "year="])
@@ -93,17 +93,57 @@ def main(argv):
         elif opt in ("-y", "--year"):
             year = arg
             
+    print(f"Target: {target}")
+            
     if year != 'all':
         if alg == 'boruta':
+            start = time.perf_counter()
+            print("Extracting data...")
             data = datos()
-            firma_control, control, firma_secano, secano = data_preprocessing.data_any_year(target, data, int(year))
-            my_boruta.my_boruta_init(target, firma_control, control)
+            control, secano = data_preprocessing.data_any_year(target, data, int(year))
+            print("Running Boruta Algorithm...")
+            elegidos_control = my_boruta.my_boruta_init(target, control)
+            elegidos_secano = my_boruta.my_boruta_init(target, secano)
+            rangos_control = rangos_clustering(elegidos_control)
+            rangos_secano= rangos_clustering(elegidos_secano)
+            print(f"Year {year}:")
+            print(f"Selected wavelength ranges (control set): {rangos_control}")
+            print(f"Selected wavelength ranges (dry set): {rangos_secano}")
+            end = time.perf_counter()
+            print(f"Execution time: {end - start:0.2f} seconds.")
             
+        elif alg == 'kbestcorr':
+            start = time.perf_counter()
+            print("Extracting data...")
+            data = datos ()
+            control, secano = data_preprocessing.data_any_year(target, data, int(year))
+            print("Running SelectK-Best (Correlation)...")
+            elegidos_control = kbest.kbest_corr(target, control)
+            elegidos_secano = kbest.kbest_corr(target, secano)
+            rangos_control = rangos_clustering(elegidos_control)
+            rangos_secano = rangos_clustering(elegidos_secano)
+            print(f"Year {year}:")
+            print(f"Selected wavelength ranges (control set): {rangos_control}")
+            print(f"Selected wavelength ranges (dry set): {rangos_secano}")
+            end = time.perf_counter()
+            print(f"Execution time: {end - start:0.2f} seconds.")
             
-    
-    print("Target:", target)
-    print("Algoritmo:", alg)
-    print("Anios:", year)    
+        elif alg == 'kbestmi':
+            start = time.perf_counter()
+            print("Extracting data...")
+            data = datos ()
+            control, secano = data_preprocessing.data_any_year(target, data, int(year))
+            print("Running SelectK-Best (Mutual Information)...")
+            elegidos_control = kbest.kbest_mi(target, control)
+            elegidos_secano = kbest.kbest_mi(target, secano)
+            rangos_control = rangos_clustering(elegidos_control)
+            rangos_secano = rangos_clustering(elegidos_secano)
+            print(f"Year {year}:")
+            print(f"Selected wavelength ranges (control set): {rangos_control}")
+            print(f"Selected wavelength ranges (dry set): {rangos_secano}")
+            end = time.perf_counter()
+            print(f"Execution time: {end - start:0.2f} seconds.")
+            
     
     
 

@@ -8,8 +8,10 @@ def string_to_int(lista):
             lista[i] = int(lista[i])
         return lista
 
-def my_boruta_init(target, firma, control):
-    print("Ejecutando Boruta...")
+def my_boruta_init(target, dataset):
+    # get signature columns
+    firma = dataset.loc[ : , 1:(len(dataset.columns)-1)]
+    
     forest = RandomForestRegressor(
         n_jobs = -1, 
         max_depth = 5
@@ -20,16 +22,16 @@ def my_boruta_init(target, firma, control):
         max_iter = 100 # number of trials to perform
     )
 
-    print("descripción firma_control")
-    print(firma.describe())
-    asd = control.loc[ : , target]
-    print("descripción control")
-    print(asd.describe())
+    # print("descripción firma_control")
+    # print(firma.describe())
+    # asd = dataset.loc[ : , target]
+    # print("descripción control")
+    # print(asd.describe())
     
     # fit Boruta (it accepts np.array, not pd.DataFrame)
-    boruta.fit(np.array(firma), np.array(control.loc[ : , target]))
+    boruta.fit(np.array(firma), np.array(dataset.loc[ : , target]))
     
-    # print results grupo control
+    # print results
     green_area = firma.columns[boruta.support_].to_list()
     blue_area = firma.columns[boruta.support_weak_].to_list()
     
