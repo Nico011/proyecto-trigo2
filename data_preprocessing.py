@@ -6,21 +6,20 @@ from sklearn.preprocessing import StandardScaler
 
 def data_any_year(target, datos, year):
     filtro1 = datos[datos["ANIO"] == year]
-    filtro2 = datos[datos["ANIO"] == year]
     
-    filtro1 = filtro1[filtro1["CONDICION"] != "SECANO"]
-    filtro2 = filtro2[filtro2["CONDICION"] == "SECANO"]
+    control1 = filtro1[filtro1["CONDICION"] != "SECANO"]
+    secano1 = filtro1[filtro1["CONDICION"] == "SECANO"]
     
-    df_chl_control = filtro1.loc[ : , target]
-    df_firma_control = filtro1.loc[ : , "350":"2500"]
+    df_chl_control = control1.loc[ : , target]
+    df_firma_control = control1.loc[ : , "350":"2500"]
     cols = list(df_firma_control.columns.values) # recuperamos los nombres de columnas
     
     # Estandarizar control
     df_firma_control = pandas.DataFrame(StandardScaler().fit_transform(df_firma_control)) 
     df_firma_control.columns = cols
     
-    df_chl_secano = filtro2.loc[ : , target]
-    df_firma_secano = filtro2.loc[ : , "350":len(filtro2)-1]
+    df_chl_secano = secano1.loc[ : , target]
+    df_firma_secano = secano1.loc[ : , "350":"2500"]
     
     # Estandarizar secano
     df_firma_secano = pandas.DataFrame(StandardScaler().fit_transform(df_firma_secano)) 
