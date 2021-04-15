@@ -6,17 +6,17 @@ from sklearn.preprocessing import StandardScaler
 
 def data_any_year(target, datos, year):
     # get data for given year
-    filtro1 = datos[datos["ANIO"] == year]
+    filter_year = datos[datos["ANIO"] == year]
     
     # separete data sets (secano/control)
-    control1 = filtro1[filtro1["CONDICION"] != "SECANO"]
-    secano1 = filtro1[filtro1["CONDICION"] == "SECANO"]
+    filter_control = filter_year[filter_year["CONDICION"] != "SECANO"]
+    filter_secano = filter_year[filter_year["CONDICION"] == "SECANO"]
     
     # get target column
-    df_target_control = control1.loc[ : , target]
+    df_target_control = filter_control.loc[ : , target]
     
     # get signature columns, and column names as list
-    df_firma_control = control1.loc[ : , "350":"2500"]
+    df_firma_control = filter_control.loc[ : , "350":"2500"]
     cols = list(df_firma_control.columns.values) 
     
     # Standardize signature
@@ -29,25 +29,25 @@ def data_any_year(target, datos, year):
     # assign column names to dataframe
     df_firma_control.columns = cols
     
+    df_target_secano = filter_secano.loc[ : , target]
+    df_firma_secano = filter_secano.loc[ : , "350":"2500"]
     
-    df_target_secano = secano1.loc[ : , target]
-    df_firma_secano = secano1.loc[ : , "350":"2500"]
-    
-    # Estandarizar secano
+    # Estandadize secano
     df_firma_secano = pandas.DataFrame(StandardScaler().fit_transform(df_firma_secano)) 
     df_firma_secano.columns = cols
     
-    # Unir columna a predecir con predictores
+    # join target column to predictors
     control = pandas.concat([df_target_control.reset_index(drop=True), df_firma_control], axis = 1)
     secano = pandas.concat([df_target_secano.reset_index(drop=True), df_firma_secano], axis = 1)
     
-    # eliminar NAs
+    print("# of NaN (control dataset):", control.isna().sum().sum())
+    print("# of NaN (dry land dataset):", secano.isna().sum().sum())
+    
+    # drop rows with NAs
     control.dropna(inplace = True)
     secano.dropna(inplace = True)
     
-    # Reasignamos estas variables, pero ahora se eliminaron los NAs y se estandarizó
-    # firma_control = control.loc[ : , "350":"2500"]
-    # firma_secano = secano.loc[ : , "350":"2500"]
+    # return control dataframe and secano dataframe
     return control, secano
 
 
@@ -79,14 +79,14 @@ def data_2014(target, datos):
     control_2014 = pandas.concat([df_chl_control_2014.reset_index(drop=True), df_firma_control_2014], axis = 1)
     secano_2014 = pandas.concat([df_chl_secano_2014.reset_index(drop=True), df_firma_secano_2014], axis = 1)
     
+    print("# of NaN (control dataset):", control_2014.isna().sum().sum())
+    print("# of NaN (dry land dataset):", secano_2014.isna().sum().sum())
+    
     # eliminar NAs
     control_2014.dropna(inplace = True)
     secano_2014.dropna(inplace = True)
     
-    # Reasignamos estas variables, pero ahora se eliminaron los NAs y se estandarizó
-    firma_control_2014 = control_2014.loc[ : , "350":"2500"]
-    firma_secano_2014 = secano_2014.loc[ : , "350":"2500"]
-    return firma_control_2014, control_2014
+    return control_2014, secano_2014
 
 def data_2015(target, datos):
     # filtro por año (2015) -----------------------------------
@@ -115,14 +115,14 @@ def data_2015(target, datos):
     control_2015 = pandas.concat([df_chl_control_2015.reset_index(drop=True), df_firma_control_2015], axis = 1)
     secano_2015 = pandas.concat([df_chl_secano_2015.reset_index(drop=True), df_firma_secano_2015], axis = 1)
     
+    print("# of NaN (control dataset):", control_2015.isna().sum().sum())
+    print("# of NaN (dry land dataset):", secano_2015.isna().sum().sum())
+    
     # eliminar NAs
     control_2015.dropna(inplace = True)
     secano_2015.dropna(inplace = True)
     
-    # Reasignamos estas variables, pero ahora se eliminaron los NAs y se estandarizó
-    firma_control_2015 = control_2015.loc[ : , "350":"2500"]
-    firma_secano_2015 = secano_2015.loc[ : , "350":"2500"]
-    return
+    return control_2015, secano_2015
 
 def data_2016(target, datos):
     # filtro por año (2016) -----------------------------------------------
@@ -152,14 +152,14 @@ def data_2016(target, datos):
     control_2016 = pandas.concat([df_chl_control_2016.reset_index(drop=True), df_firma_control_2016], axis = 1)
     secano_2016 = pandas.concat([df_chl_secano_2016.reset_index(drop=True), df_firma_secano_2016], axis = 1)
     
+    print("# of NaN (control dataset):", control_2016.isna().sum().sum())
+    print("# of NaN (dry land dataset):", secano_2016.isna().sum().sum())
+    
     # eliminar NAs
     control_2016.dropna(inplace = True)
     secano_2016.dropna(inplace = True)
     
-    # Reasignamos estas variables, pero ahora se eliminaron los NAs y se estandarizó
-    firma_control_2016 = control_2016.loc[ : , "350":"2499"]
-    firma_secano_2016 = secano_2016.loc[ : , "350":"2499"]
-    return
+    return control_2016, secano_2016
 
 def data_2017(target, datos):
     
@@ -189,11 +189,11 @@ def data_2017(target, datos):
     control_2017 = pandas.concat([df_chl_control_2017.reset_index(drop=True), df_firma_control_2017], axis = 1)
     secano_2017 = pandas.concat([df_chl_secano_2017.reset_index(drop=True), df_firma_secano_2017], axis = 1)
     
+    print("# of NaN (control dataset):", control_2017.isna().sum().sum())
+    print("# of NaN (dry land dataset):", secano_2017.isna().sum().sum())
+    
     # eliminar NAs
     control_2017.dropna(inplace = True)
     secano_2017.dropna(inplace = True)
     
-    # Reasignamos estas variables, pero ahora se eliminaron los NAs y se estandarizó
-    firma_control_2017 = control_2017.loc[ : , "350":"2500"]
-    firma_secano_2017 = secano_2017.loc[ : , "350":"2500"]
-    return
+    return control_2017, secano_2017
