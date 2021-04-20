@@ -10,7 +10,7 @@ def string_to_int(lista):
 
 def my_boruta_init(target, dataset):
     # get signature columns
-    firma = dataset.loc[ : , "350":"2500"]
+    firma = dataset.loc[ : , "350":"2499"]
     target_col = dataset.loc[: , target]
     
     forest = RandomForestRegressor(

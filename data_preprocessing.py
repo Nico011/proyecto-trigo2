@@ -16,7 +16,7 @@ def data_any_year(target, datos, year):
     df_target_control = filter_control.loc[ : , target]
     
     # get signature columns, and column names as list
-    df_firma_control = filter_control.loc[ : , "350":"2500"]
+    df_firma_control = filter_control.loc[ : , "350":"2499"]
     cols = list(df_firma_control.columns.values) 
     
     # Standardize signature
@@ -30,7 +30,7 @@ def data_any_year(target, datos, year):
     df_firma_control.columns = cols
     
     df_target_secano = filter_secano.loc[ : , target]
-    df_firma_secano = filter_secano.loc[ : , "350":"2500"]
+    df_firma_secano = filter_secano.loc[ : , "350":"2499"]
     
     # Estandadize secano
     df_firma_secano = pandas.DataFrame(StandardScaler().fit_transform(df_firma_secano)) 
@@ -40,8 +40,8 @@ def data_any_year(target, datos, year):
     control = pandas.concat([df_target_control.reset_index(drop=True), df_firma_control], axis = 1)
     secano = pandas.concat([df_target_secano.reset_index(drop=True), df_firma_secano], axis = 1)
     
-    print("# of NaN (control dataset):", control.isna().sum().sum())
-    print("# of NaN (dry land dataset):", secano.isna().sum().sum())
+    print("Number of NaN (control dataset):", control.isna().sum().sum())
+    print("Number of NaN (dry land dataset):", secano.isna().sum().sum())
     
     # drop rows with NAs
     control.dropna(inplace = True)

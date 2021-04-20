@@ -21,7 +21,7 @@ def calcular_75_sup(lista_importancia):
 def kbest_corr(target, dataset):
     
     # get signature columns
-    firma = dataset.loc[ : , "350":"2500"]
+    firma = dataset.loc[ : , "350":"2499"]
     
     my_k = 'all'
     
@@ -43,7 +43,7 @@ def kbest_corr(target, dataset):
     return elegidos 
 
 def kbest_mi(target, dataset):
-    firma = dataset.loc[ : , "350":"2500"]
+    firma = dataset.loc[ : , "350":"2499"]
     
     my_k = 'all'
     

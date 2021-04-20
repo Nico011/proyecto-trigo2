@@ -8,7 +8,7 @@ import numpy as np
 def lasso_init(target, data):
     max = 150
     
-    firma = data.loc[: , "350":"2500"]
+    firma = data.loc[: , "350":"2499"]
     target_col = data.loc[: , target]
     cols = data.columns
     

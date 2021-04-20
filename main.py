@@ -4,6 +4,8 @@ import pandas
 import sys
 import getopt
 import numpy as np
+import io
+import requests
 from sklearn.preprocessing import StandardScaler
 
 import scipy.cluster.hierarchy as hcluster
@@ -16,35 +18,47 @@ import ga
 
 
 def datos():
-    # Read csv
-    datos = pandas.read_csv("data-total.csv", header=0 ,delimiter=";", encoding='ISO-8859-1')
+    # Switch commented functions to read data from file or url
+    # Read csv from file 
+    data = pandas.read_csv("data-total.csv", header=0, delimiter=";", encoding='ISO-8859-1')
     
+    # Read csv from url
+    # url = "https://raw.githubusercontent.com/Nico011/proyecto-trigo2/master/data-total.csv"
+    # get_content = requests.get(url).content
+    # data = pandas.read_csv(io.StringIO(get_content.decode('ISO-8859-1')), 
+    #                        header = 0, delimiter = ";", encoding = 'ISO-8859-1')
    
     # possible filters:
     # Fenologia != antesis
     # condición != secano
     # Genotipo = "QUP 2569-2009"
     
-    return datos
+    return data
     
 
 # This function uses hierarchical clustering to group a list of 
-# wavelength (integer) into a set of ranges.
-def rangos_clustering(data):
+# wavelengths (integer) selected as important by the feature selection algorithms
+# into a set of ranges.
+# Original algorithm from:
+# https://stackoverflow.com/questions/42415595/group-numbers-into-ranges-in-python
+def rangos_clustering(selected):
     # returns nothing when list is empty
-    if len(data) == 0:
+    if len(selected) == 0:
         print("No hay datos.")
         return
     
     # returns one range when list has one value
-    if len(data) == 1:
-        return [(data, data)]
+    if len(selected) == 1:
+        return [(selected, selected)]
     
+    # create a list with every wavelength selected as a pair with itself in 
+    # another list and cast it to pandas array
+    # ex: selected = [350, 351, 352, ...]
+    #    nselected = [[350, 350], [351, 351], [352, 352], ...]
+    nselected = [[d, d] for d in selected]
+    new_selected = np.array(nselected)
     
-    ndata = [[d, d] for d in data]
-    new_data = np.array(ndata)
-    
-    t = (11.0/100.0) * (max(data) - min(data)) # threshold 11% of the total range of data
+    t = (11.0/100.0) * (max(selected) - min(selected)) # threshold 11% of the total range of data
     
     # Clusters by using the euclidean distance metric, performs 
     # hierarchical clustering using the single linkage algorithm, and 
@@ -54,7 +68,7 @@ def rangos_clustering(data):
     # each flat cluster have no greater a cophenetic distance than t.
     # Returns: A vector of the same length as the number of ovservations, where
     # T[i] is the flat cluster number to which the original observation i belongs.
-    clusters = hcluster.fclusterdata(new_data, t, criterion = "distance")
+    clusters = hcluster.fclusterdata(new_selected, t, criterion = "distance")
     tot_clusters = max(clusters)
     
     # create an empty list with the same amount of lists as the clusters
@@ -70,10 +84,11 @@ def rangos_clustering(data):
     # the data value to express it as a range.
     rngs = []
     for x in clustered_index:
-        clustered_index_x = [data[y] for y in x]
+        clustered_index_x = [selected[y] for y in x]
         rngs.append((min(clustered_index_x), max(clustered_index_x)))
     
     # return the sorted list of ranges
+    # ex: [(350, 370), (600, 750), ...]
     return sorted(rngs)
 
 # cast resturned list of strings to integers
@@ -83,47 +98,55 @@ def string_to_int(lista):
     return lista
 
 
-def run_boruta(target, year, data):
-    control, secano = data_preprocessing.data_any_year(target, data, int(year))
+def run_boruta(target, control, secano):
     print("Running Boruta Algorithm...")
     elegidos_control = my_boruta.my_boruta_init(target, control)
-    elegidos_secano = my_boruta.my_boruta_init(target, secano)
+    print(f"Selected control: {elegidos_control}")
     rangos_control = rangos_clustering(elegidos_control)
-    rangos_secano= rangos_clustering(elegidos_secano)
     print(f"Selected wavelength ranges (control set): {rangos_control}")
+    print("")
+    elegidos_secano = my_boruta.my_boruta_init(target, secano)
+    print(f"Selected dry land: {elegidos_secano}")
+    rangos_secano= rangos_clustering(elegidos_secano)
     print(f"Selected wavelength ranges (dry land set): {rangos_secano}")
     return
 
-def run_lasso(target, year, data):
-    control, secano = data_preprocessing.data_any_year(target, data, int(year))
+def run_lasso(target, control, secano):
     print("Running LASSO...")
     elegidos_control = lasso.lasso_init(target, control)
-    elegidos_secano = lasso.lasso_init(target, secano)
+    print(f"Selected control: {elegidos_control}")
     rangos_control = rangos_clustering(elegidos_control)
-    rangos_secano = rangos_clustering(elegidos_secano)
     print(f"Selected wavelength ranges (control set): {rangos_control}")
+    print("")
+    elegidos_secano = lasso.lasso_init(target, secano)
+    print(f"Selected dry land: {elegidos_secano}")
+    rangos_secano = rangos_clustering(elegidos_secano)
     print(f"Selected wavelength ranges (dry land set): {rangos_secano}")
     return
 
-def run_kbest_corr(target, year, data):
-    control, secano = data_preprocessing.data_any_year(target, data, int(year))
+def run_kbest_corr(target, control, secano):
     print("Running SelectK-Best (Correlation)...")
     elegidos_control = kbest.kbest_corr(target, control)
-    elegidos_secano = kbest.kbest_corr(target, secano)
+    print(f"Selected control: {elegidos_control}")
     rangos_control = rangos_clustering(elegidos_control)
-    rangos_secano = rangos_clustering(elegidos_secano)
     print(f"Selected wavelength ranges (control set): {rangos_control}")
+    print("")
+    elegidos_secano = kbest.kbest_corr(target, secano)
+    print(f"Selected dry land: {elegidos_secano}")
+    rangos_secano = rangos_clustering(elegidos_secano)
     print(f"Selected wavelength ranges (dry land set): {rangos_secano}")
     return
 
-def run_kbest_mi(target, year, data):
-    control, secano = data_preprocessing.data_any_year(target, data, int(year))
+def run_kbest_mi(target, control, secano):
     print("Running SelectK-Best (Mutual Information)...")
     elegidos_control = kbest.kbest_mi(target, control)
-    elegidos_secano = kbest.kbest_mi(target, secano)
+    print(f"Selected control: {elegidos_control}")
     rangos_control = rangos_clustering(elegidos_control)
-    rangos_secano = rangos_clustering(elegidos_secano)
     print(f"Selected wavelength ranges (control set): {rangos_control}")
+    print("")
+    elegidos_secano = kbest.kbest_mi(target, secano)
+    print(f"Selected dry land: {elegidos_secano}")
+    rangos_secano = rangos_clustering(elegidos_secano)
     print(f"Selected wavelength ranges (dry land set): {rangos_secano}")
     return
 
@@ -131,8 +154,8 @@ def main(argv):
     # default values for line commands
     years_default = [2014, 2015, 2016, 2017]
     target = 'Chl'
-    alg = 'all'
-    year = 'all'
+    alg = 'kbestcorr'
+    year = '2014'
     
     try:
         opts, arg = getopt.getopt(argv, "ht:a:y:", ["target=", "algorithm=", "year="])
@@ -152,58 +175,55 @@ def main(argv):
             year = arg
             
     print(f"Target: {target}")
+    print("")
+   
             
-    if year != 'all' and alg != 'all':
+    if year != 'all' and alg != 'all': 
+        
+        print("Extracting data...")
+        data = datos ()
+        control, secano = data_preprocessing.data_any_year(target, data, int(year))
+        print(f"Year {year}:")
+        
         if alg == 'boruta':
             start = time.perf_counter()
-            print(f"Year {year}:")
-            print("Extracting data...")
-            data = datos ()
-            run_boruta(target, year, data)
+            run_boruta(target, control, secano)
             end = time.perf_counter()
             print(f"Execution time: {end - start:0.2f} seconds.")
             
         elif alg == 'lasso':
             start = time.perf_counter()
-            print(f"Year {year}:")
-            print("Extracting data...")
-            data = datos ()
-            run_lasso(target, year, data)
+            run_lasso(target, control, secano)
             end = time.perf_counter()
             print(f"Execution time: {end - start:0.2f} seconds.")
             
         elif alg == 'kbestcorr':
             start = time.perf_counter()
-            print(f"Year {year}:")
-            print("Extracting data...")
-            data = datos ()
-            run_kbest_corr(target, year, data)
+            run_kbest_corr(target, control, secano)
             end = time.perf_counter()
             print(f"Execution time: {end - start:0.2f} seconds.")
             
         elif alg == 'kbestmi':
             start = time.perf_counter()
-            print(f"Year {year}:")
-            print("Extracting data...")
-            data = datos ()
-            run_kbest_mi(target, year, data)
+            run_kbest_mi(target, control, secano)
             end = time.perf_counter()
             print(f"Execution time: {end - start:0.2f} seconds.")
             
     else:
+        print("Extracting data...")
+        data = datos ()
+        control, secano = data_preprocessing.data_any_year(target, data, int(year))
         start = time.perf_counter()
         for i in range(len(years_default)):
-            print(f"Year {years_default[i]}")
-            print("Extracting data...")
-            data = datos()
-            run_kbest_corr(target, years_default[i], data)
-            print()
-            run_kbest_mi(target, years_default[i], data)
-            print()
-            run_boruta(target, years_default[i], data)
-            print()
-            run_lasso(target, years_default[i], data)
-            print()
+            print(f"Year: {years_default[i]}:")
+            run_kbest_corr(target, control, secano)
+            print("")
+            run_kbest_mi(target, control, secano)
+            print("")
+            run_boruta(target, control, secano)
+            print("")
+            run_lasso(target, control, secano)
+            print("")
         end = time.perf_counter()
         print(f"Execution time: {end - start:0.2f} seconds.")
 
