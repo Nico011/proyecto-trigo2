@@ -8,6 +8,8 @@ def string_to_int(lista):
             lista[i] = int(lista[i])
         return lista
 
+# Original algorithm from
+# https://towardsdatascience.com/boruta-explained-the-way-i-wish-someone-explained-it-to-me-4489d70e154a
 def my_boruta_init(target, dataset):
     # get signature columns
     firma = dataset.loc[ : , "350":"2499"]
@@ -26,7 +28,9 @@ def my_boruta_init(target, dataset):
     # fit Boruta (it accepts np.array, not pd.DataFrame)
     boruta.fit(np.array(firma), np.array(target_col))
     
-    # print results
+    # results
+    # green_area: features admitted as confirmed
+    # blue_area: features claimed as tetative
     green_area = firma.columns[boruta.support_].to_list()
     blue_area = firma.columns[boruta.support_weak_].to_list()
     

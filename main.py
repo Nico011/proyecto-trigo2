@@ -76,9 +76,11 @@ def rangos_clustering(selected):
     for i in range(tot_clusters):
         clustered_index.append([])
     
-    # append the index of the cluster to its respectvie list
+    # append the index of the list (selected) to its respective cluster
     for i in range(len(clusters)):
         clustered_index[clusters[i] - 1].append(i)
+    
+    print(f"clustered_index2: {clustered_index}")
         
     # create a new list, then for each list of indexes replace min and max for
     # the data value to express it as a range.
@@ -98,6 +100,12 @@ def string_to_int(lista):
     return lista
 
 
+# The following functions run each algorithm available and prints their results.
+# They all work about the same. They receive as parameters the target (string),
+# and the filtered dataset separated as control and dry land.
+# They print the name of the algorithm,
+# wavelength selected as important by the algorithm, and
+# wavelength selected as important in range format.
 def run_boruta(target, control, secano):
     print("Running Boruta Algorithm...")
     elegidos_control = my_boruta.my_boruta_init(target, control)
@@ -150,6 +158,8 @@ def run_kbest_mi(target, control, secano):
     print(f"Selected wavelength ranges (dry land set): {rangos_secano}")
     return
 
+
+# Main function
 def main(argv):
     # default values for line commands
     years_default = [2014, 2015, 2016, 2017]

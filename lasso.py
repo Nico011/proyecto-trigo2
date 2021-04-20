@@ -4,9 +4,8 @@ from sklearn.linear_model import LassoCV
 import numpy as np
 
 
-#### LASSO feature selection ####################
 def lasso_init(target, data):
-    max = 150
+    max = 1500
     
     firma = data.loc[: , "350":"2499"]
     target_col = data.loc[: , target]
@@ -15,22 +14,21 @@ def lasso_init(target, data):
     lasso_control = LassoCV(max_iter = 10000).fit(firma, target_col)
     importancia_c = np.abs(lasso_control.coef_)
     
-    # Este bucle busca en la lista de valores de importancia ordenadas
-    # de mayor a menor el índice del primer valor en 0 para mostrar 
-    # esa cantidad o un máximo 150 (max) elementos.
+    # This loop searches the list of importance values ordered from
+    # highest to lowest the index of the first value at 0 to show that amount
+    # or a maximum (max) of items.
     for i in range(len(importancia_c)):
         if importancia_c[importancia_c.argsort()[::-1][i]] == 0 or i >= max:
             attr_n = i
-            # print("indice del primer valor 0: " + str(attr_n))
             break
     
     attrs_c = importancia_c.argsort()[::-1][:attr_n]
     cols_aux = np.array(cols)[attrs_c]
     
-    # convertir str a int
+    # cast str to int
     cols_aux = cols_aux.astype(int)
         
-    # ordenamos en orden ascendente
+    # sort in ascending order
     cols_aux = np.sort(cols_aux)
     
     return cols_aux 
