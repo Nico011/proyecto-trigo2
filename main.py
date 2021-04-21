@@ -44,7 +44,7 @@ def datos():
 def rangos_clustering(selected):
     # returns nothing when list is empty
     if len(selected) == 0:
-        print("No hay datos.")
+        print("None")
         return
     
     # returns one range when list has one value
@@ -80,7 +80,7 @@ def rangos_clustering(selected):
     for i in range(len(clusters)):
         clustered_index[clusters[i] - 1].append(i)
     
-    print(f"clustered_index2: {clustered_index}")
+    # print(f"clustered_index2: {clustered_index}")
         
     # create a new list, then for each list of indexes replace min and max for
     # the data value to express it as a range.
@@ -164,8 +164,8 @@ def main(argv):
     # default values for line commands
     years_default = [2014, 2015, 2016, 2017]
     target = 'Chl'
-    alg = 'kbestcorr'
-    year = '2014'
+    alg = 'all'
+    year = 'all'
     
     try:
         opts, arg = getopt.getopt(argv, "ht:a:y:", ["target=", "algorithm=", "year="])
@@ -222,10 +222,10 @@ def main(argv):
     else:
         print("Extracting data...")
         data = datos ()
-        control, secano = data_preprocessing.data_any_year(target, data, int(year))
         start = time.perf_counter()
         for i in range(len(years_default)):
-            print(f"Year: {years_default[i]}:")
+            control, secano = data_preprocessing.data_any_year(target, data, years_default[i])
+            print(f"Year: {years_default[i]} ")
             run_kbest_corr(target, control, secano)
             print("")
             run_kbest_mi(target, control, secano)
