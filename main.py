@@ -167,15 +167,36 @@ def main(argv):
     alg = 'all'
     year = 'all'
     
+    str_help = """Usage:
+my_main.py -t <target> [-a <algorithm> -y <year>]
+
+-t --target    : Give a specific target (Deafault: Chl).
+-a --algorithm : Give a specific feature selection algorithm (Optional, default: all).
+-y --year      : Give a specific year (Optional, default: all).
+
+Targets available: Chl, Flav, Anth, NBI, Pot.Hoja(Bar), Transmitted, 
+                   LAI, EVAP, GS, PN, CI, VPD, 1000G-gr, G-espiga, Esp_m2, 
+                   IC, ALT, PHECT, Rto_ton_ha, BiomasaTon_ha
+
+Algorithms available: 
+    boruta     : Run Boruta feature selection algorithm.
+    lasso      : Run LASSO feature selection algorithm.
+    kbestcorr  : Run SelectkBest using the correlation ranking.
+    kbestmi    : Run SelectkBest using mutual information ranking.
+
+Years available: 2014, 2015, 2016 and 2017."""
+
     try:
         opts, arg = getopt.getopt(argv, "ht:a:y:", ["target=", "algorithm=", "year="])
-    except getopt.GetoptError:
-        print("my_main.py -t <target> -a <algorithm> -y <year>")
+    except getopt.GetoptError as msg:
+        sys.stdout = sys.stderr
+        print(msg)
+        print(str_help)
         sys.exit(2)
     
     for opt, arg in opts:
         if opt == '-h':
-            print("my_main.py -t <target> -a <algorithm> -y <year>")
+            print(str_help)
             sys.exit()
         elif opt in ("-t", "--target"):
             target = arg
