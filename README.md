@@ -45,7 +45,7 @@ Ejemplo de dataframe luego de filtrar:
 
 [128 rows x 2151 columns]
 ```
-Para este ejemplo, se muestran los datos del año 2014 de las plantas de riego. La variable objetivo en este caso es clorofila (Chl) y se han estandarizado los valores de las columnas predictoras (el valor estandarizado es dado por el resultado de `(x - u) / s`, donde `x` es el valor antes de estandarizar, `u` es el promedio y `s` la desviación estándar.
+Para este ejemplo, se muestran los datos del año 2014 de las plantas de riego. La variable objetivo en este caso es clorofila (Chl) y se han estandarizado los valores de las columnas predictoras (el valor estandarizado es dado por el resultado de `(x - u) / s`, donde `x` es el valor antes de estandarizar, `u` es el promedio y `s` la desviación estándar. Por falta de datos, se dejó fuera la columna para la longitud de onde 2500.
 
 
 ### Los algoritmos
