@@ -6,7 +6,7 @@ Los datos para este proyecto contienen observaciones fisiológicas, de fluoresce
 
 
 ### Los datos
-Los datos se encuentran en el archivo **data-total.csv**. Este archivo combina las medidas tomadas los cuatro años antes mencionados, de ambas localidades (Cauquenes y Santa Rosa). De las columnas se pueden separar en cuatro grupos: el primero contiene datos sobre la medición (ID, fecha, condición de riego, parcela, etc); un segundo grupo con las variables fisiológicas de cada medición (clorofila, flavonoides, conductancia estomática, etc.); un tercer grupo con meddiciones de fluorescencia de la clorfila; y por último, las columnas que contienen las medidas de reflectancia donde cada columna es una longitud de onda desde 350 a 2500nm. Dando un total de 2197 columnas y 1579 observaciones
+Los datos se encuentran en el archivo **data-total.csv**. Este archivo combina las medidas tomadas los cuatro años antes mencionados, de ambas localidades (Cauquenes y Santa Rosa). De las columnas se pueden separar en cuatro grupos: el primero contiene datos sobre la medición (ID, fecha, condición de riego, parcela, etc); un segundo grupo con las variables fisiológicas de cada medición (clorofila, flavonoides, conductancia estomática, etc.); un tercer grupo con meddiciones de fluorescencia de la clorfila; y por último, las columnas que contienen las medidas de reflectancia donde cada columna es una longitud de onda desde 350 a 2500nm. Dando un total de 2197 columnas y 1579 observaciones.
 Para este se consideran los grupos dos y tres como variables objetivos y predictores respectivamente. En caso de existir datos faltantes se elimina la fila.
 
 Ejemplo de dataframe de los datos antes de filtrar:
@@ -56,6 +56,26 @@ Se han implementado 4 algoritmos de selección de atributos, divididos en distin
   * Mutual information: Función kbest_mi().
   * Correlation: Función kbest_corr().
 
+### Uso
+Abrir el archivo `main.py` desde la terminal y entregar los parámetros:
+
+```main.py -t <target> [-a <algoritmo> -y <año>]```
+
+En caso de especificar un algorito es necesario especificar un año, en caso contrario se ejecutarán todos los algoritmos para todos los años. Se puede no especificar el target y tomará la clorofila (Chl) por default.
+
+Targets disponibles: Chl, Flav, Anth, NBI, Pot.Hoja(Bar), Transmitted, LAI, EVAP, GS, PN, CI, VPD, 1000G-gr, G-espiga, Esp_m2, IC, ALT, PHECT, Rto_ton_ha, BiomasaTon_ha.
+
+Algoritmos disponibles: 
+* boruta: Ejecuta algoritmo Boruta.
+* lasso: Ejecuta algoritmo LASSO
+* kbestcorr: Ejecuta algoritmo SelectkBest usando correlación.
+* kbestmi: Ejecuta algoritmo SelectkBest usando información mutua.
+
+Años disponibles: 2014, 2015, 2016 y 2017.
+
+Puede usar el comando `-h` o `--help` para obtener una ayuda similar a la descripción anterior.
+
+Ej: `main.py --help`
 
 ### Referencias
 * S. Romero-Bravo et al., “Thermal Imaginig Reliability for Estimating Grain Yield and Carbon Isotope Discrimination in Wheat Genotypes: Importance of the Enviromental Conditions,” pp. 1–16.
