@@ -4,9 +4,25 @@ import pandas
 from sklearn.preprocessing import StandardScaler
 
 # Data preprocessing for a year given as parameter
-def data_any_year(target, datos, year):
+def data_any_year(target, year):
+    
+    # Switch commented functions to read data from file or url
+    # Read csv from file 
+    data = pandas.read_csv("data-total.csv", header=0, delimiter=";", encoding='ISO-8859-1')
+    
+    # Read csv from url
+    # url = "https://raw.githubusercontent.com/Nico011/proyecto-trigo2/master/data-total.csv"
+    # get_content = requests.get(url).content
+    # data = pandas.read_csv(io.StringIO(get_content.decode('ISO-8859-1')), 
+    #                        header = 0, delimiter = ";", encoding = 'ISO-8859-1')
+   
+    # possible filters:
+    # Fenologia != antesis
+    # condición != secano
+    # Genotipo = "QUP 2569-2009"
+    
     # get data for given year
-    filter_year = datos[datos["ANIO"] == year]
+    filter_year = data[data["ANIO"] == year]
     
     # separete data sets (secano/control)
     filter_control = filter_year[filter_year["CONDICION"] != "SECANO"]

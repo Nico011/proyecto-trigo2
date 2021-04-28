@@ -9,7 +9,7 @@ def lasso_init(target, data):
     firma = data.loc[: , "350":"2499"]
     target_col = data.loc[: , target]
     
-    lasso = LassoCV(max_iter = 10000).fit(firma, target_col)
+    lasso = LassoCV(max_iter = 15000).fit(firma, target_col)
     important = np.abs(lasso.coef_)
     
     # Create list with the selected wavelength, search through coef_ list, when it
