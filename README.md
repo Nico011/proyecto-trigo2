@@ -1,11 +1,25 @@
 # Identificación de rangos de longitud de onda relacionados a variables fisiológicas de trigo usando algoritmos de selección de atributos.
 
-### Resumen
-En este proyecto se utilizan algoritmos de selección de atributos para optimizar la lectura de firma espectral de plantas de trigo para alguna variable objetivo o **target**.
-Los datos para este proyecto contienen observaciones fisiológicas, de fluorescencia de la clorofila y firma hiper-espectral de distintos genotipos de trigo, en distintas etapas de madurez, condición de riego y lugar geográfico, las que fueron tomadas entre los años 2014 y 2017. Los métodos de obtención de los datos varían entre mediciones de campo o en laboratorio. Para el caso de la firma hiper-espectral se decidió usar las medidas tomadas con reflectómetro de clip, que mide la reflectancia entre 350 a 2500nm, y además, mide directamente desde la hoja y no percibe ruido.
+
+## Resumen
+### Motivación
+El trigo, junto al maíz, arroz y otros cereales, son la base alimenticia de la civilización y su cultivo se enfrenta a grandes problemas, como: poder entregar un alto valor nutritivo, alcanzar en términs de cantidad para una población en constante crecimiento, disminuir el impacto ambiental que conlleva cumplir los requisitos mencionados. La selección de plantas en etapas tempranas de desarrollo para producción o cruce ahorraría bastante tiempo y recursos a los investigadores, por eso este trabajo busca encontrar indicadores para realizar dicha selección.
 
 
-### Los datos
+### Objetivo general
+Encontrar rangos de longitudes de onda en la medición hiper-espectral que describan características fisiológicas del trigo.
+
+
+### Objetivo específico
+Aplicar algoritmos de selección de atributos sobre la firma hiper-espectral para encontrar longitudes de onda que caractericen variables fisiológicas para optimización de la lectura de la firma.
+
+
+### Hipótesis preliminar
+¿Es posible identificar rangos de longitud de onda de la firma hiper-espectral que permitan estimar variables fisiológicas del trigo utilizando algoritmos de selección de atributos?
+
+
+### Datos y métodos
+Los datos para este proyecto contienen observaciones fisiológicas, de fluorescencia de la clorofila y firma hiper-espectral de distintos genotipos de trigo, en distintas etapas de madurez, condición de riego y lugar geográfico, las que fueron tomadas entre los años 2014 y 2017. Los métodos de obtención de los datos varían entre mediciones de campo o en laboratorio. Para el caso de la firma hiper-espectral se decidió usar las medidas tomadas con reflectómetro de clip, que mide la reflectancia entre 350 a 2500nm directamente desde la hoja y no percibe ruido.
 Los datos se encuentran en el archivo **data-total.csv**. Este archivo combina las medidas tomadas los cuatro años antes mencionados, de ambas localidades (Cauquenes y Santa Rosa). De las columnas se pueden separar en cuatro grupos: el primero contiene datos sobre la medición (ID, fecha, condición de riego, parcela, etc); un segundo grupo con las variables fisiológicas de cada medición (clorofila, flavonoides, conductancia estomática, etc.); un tercer grupo con meddiciones de fluorescencia de la clorfila; y por último, las columnas que contienen las medidas de reflectancia donde cada columna es una longitud de onda desde 350 a 2500nm. Dando un total de 2197 columnas y 1579 observaciones.
 Para este se consideran los grupos dos y tres como variables objetivos y predictores respectivamente. En caso de existir datos faltantes se elimina la fila.
 
@@ -46,6 +60,10 @@ Ejemplo de dataframe luego de filtrar:
 [128 rows x 2151 columns]
 ```
 Para este ejemplo, se muestran los datos del año 2014 de las plantas de riego. La variable objetivo en este caso es clorofila (Chl) y se han estandarizado los valores de las columnas predictoras (el valor estandarizado es dado por el resultado de `(x - u) / s`, donde `x` es el valor antes de estandarizar, `u` es el promedio y `s` la desviación estándar. Por falta de datos, se dejó fuera la columna para la longitud de onde 2500.
+
+
+### Resultados esperados
+Se espera que los distintos algoritmos usados entreguen rangos similares para las mismas variables fisiológicas, estos rangos funcionarían como indicadores característicos y ayudarían a optimizar la lectura de la firma hiper-espectral.
 
 
 ### Los algoritmos

@@ -14,6 +14,7 @@ import numpy as np
 import io
 import requests
 import copy
+import os
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
@@ -249,9 +250,10 @@ Years available: 2014, 2015, 2016 and 2017."""
             
     else:
         print("Extracting data...")
-        start = time.perf_counter()
+        time_total = 0
         for i in range(len(years_default)):
             control, secano = data_preprocessing.data_any_year(target, years_default[i])
+            start = time.perf_counter()
             print(f"Year: {years_default[i]} ")
             run_kbest_corr(target, control, secano)
             print("")
@@ -261,8 +263,11 @@ Years available: 2014, 2015, 2016 and 2017."""
             print("")
             run_lasso(target, control, secano)
             print("")
-        end = time.perf_counter()
-        print(f"Execution time: {end - start:0.2f} seconds.")
+            end = time.perf_counter()
+            time_total = time_total + (end - start)
+        print(f"Execution time: {time_total:0.2f} seconds.")
+    
+    print(f"Boxplot graphs saved as image in current working directory ({os.getcwd()})")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
