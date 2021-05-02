@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import pandas
+import matplotlib.pyplot as plt
+import seaborn
 from sklearn.preprocessing import StandardScaler
 
 # Data preprocessing for a year given as parameter
@@ -24,9 +26,9 @@ def data_any_year(target, year):
     # get data for given year
     filter_year = data[data["ANIO"] == year]
     
-    # separete data sets (secano/control)
+    # separete data sets (water_stress/control)
     filter_control = filter_year[filter_year["CONDICION"] != "SECANO"]
-    filter_secano = filter_year[filter_year["CONDICION"] == "SECANO"]
+    filter_water_stress = filter_year[filter_year["CONDICION"] == "SECANO"]
     
     # get target column
     df_target_control = filter_control.loc[ : , target]
@@ -45,23 +47,23 @@ def data_any_year(target, year):
     # assign column names to dataframe
     df_firma_control.columns = cols
     
-    df_target_secano = filter_secano.loc[ : , target]
-    df_firma_secano = filter_secano.loc[ : , "350":"2499"]
+    df_target_water_stress = filter_water_stress.loc[ : , target]
+    df_firma_water_stress = filter_water_stress.loc[ : , "350":"2499"]
     
-    # Estandadize secano
-    df_firma_secano = pandas.DataFrame(StandardScaler().fit_transform(df_firma_secano)) 
-    df_firma_secano.columns = cols
+    # Estandadize water_stress
+    df_firma_water_stress = pandas.DataFrame(StandardScaler().fit_transform(df_firma_water_stress)) 
+    df_firma_water_stress.columns = cols
     
     # join target column to predictors
     control = pandas.concat([df_target_control.reset_index(drop=True), df_firma_control], axis = 1)
-    secano = pandas.concat([df_target_secano.reset_index(drop=True), df_firma_secano], axis = 1)
+    water_stress = pandas.concat([df_target_water_stress.reset_index(drop=True), df_firma_water_stress], axis = 1)
     
     print("Number of NaN (control dataset):", control.isna().sum().sum())
-    print("Number of NaN (dry land dataset):", secano.isna().sum().sum())
+    print("Number of NaN (water stress dataset):", water_stress.isna().sum().sum())
     
     # drop rows with NAs
     control.dropna(inplace = True)
-    secano.dropna(inplace = True)
+    water_stress.dropna(inplace = True)
     
-    # return control dataframe and dry land dataframe
-    return control, secano
+    # return control dataframe and water stress dataframe
+    return control, water_stress
