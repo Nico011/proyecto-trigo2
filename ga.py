@@ -9,12 +9,12 @@ from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
 
 
-model_target = 0.5 # r2 target
+model_target = 0.3 # r2 target
 length = 1 # number of the dataset col (will be changed in ga)()
-population_number = 50
-pressure = 5 # individuals selected to reproduction
-mutation_chance = 0.2
-generations = 25
+population_number = 70
+pressure = 10 # individuals selected to reproduction
+mutation_chance = 0.33
+generations = 200
 X = pandas.DataFrame({'col': []}) # create empty dataframe (will be changed in ga())
 y = pandas.DataFrame({'col': []}) # create empty dataframe (will be changed in ga())
 
@@ -41,7 +41,18 @@ def regression(individual):
 
 # Create an individual
 def individual(min, max):
-    return [random.randint(min, max) for i in range(length)]
+    # ind = [random.randint(min, max) for i in range(length)]
+    ind = []
+    n1 = 0
+    for i in range(length):
+        r = random.random()
+        if r >= 0.00 and r <= 0.05:
+            ind.append(1)
+            n1 += 1
+        else:
+            ind.append(0)
+    # print(f"cantidad seleccionada: {n1}")
+    return ind
 
 # Create population of new individuals
 def create_population():
@@ -56,36 +67,57 @@ def fitness_func(individual):
     for i in range(len(individual)):
         if individual[i] == 1:
             cols.append(str(i + 350)) 
-    print(f"len/cols:{len(cols)} / {cols}")
+    # print(f"len/cols:{len(cols)} / {cols}")
     
     r2 = regression(cols)
+    # print(f"r2: {r2}")
     if r2 >= model_target:
         fitness += 1
         
     return fitness
 
 def selection_reproduction(population):
+    """
+        Puntua todos los elementos de la poblacion (population) y se queda con los mejores
+        guardandolos dentro de 'selected'.
+        Despues mezcla el material genetico de los elegidos para crear nuevos individuos y
+        llenar la poblacion (guardando tambien una copia de los individuos seleccionados sin
+        modificar).
+
+        Por ultimo muta a los individuos.
+
+    """
     # calculate fitness of every individual and save it as a pair
-    print(f"largo pop: {len(population)}")
-    print(f"pop: {population[0]}")
+    # print(f"largo pop: {len(population)}")
+    # print(f"pop: {population[0]}")
+    
     scored = [(fitness_func(i), i) for i in population] # ex: (5, [1, 0, 0, 1, ...])
+    
     print(f"largo scored1: {len(scored)}")
     print(f"largo del 1er elemento: {len(scored[0])}")
-    print(f"scored1: {scored[0]}")
-    scored = [i[1] for i in sorted(scored)]
-    print(f"largo scored2: {len(scored)}")
-    print(f"largo del 1er elemento: {len(scored[0])}")
-    print(f"scored2: {scored[0]}")
-    population = scored
-    print(f"largo pop: {len(population)}")
-    print(f"largo 1er el: {len(population[0])}")
-    print(f"population: {population[0]}")
+    print(f"scored1 last: {scored[-1]}")
     
-    # select 'n' las individuals, where n = pressure
+    # ordena en forma ascendente según su valor de fitness y se queda solo 
+    # con los individuos
+    scored = [i[1] for i in sorted(scored)]
+    
+    # print(f"largo scored2: {len(scored)}")
+    # print(f"largo del 1er elemento: {len(scored[0])}")
+    # print(f"scored2: {scored[0]}")
+    
+    # population pasa a ser una lista de individuos donde lo que tienen
+    # mayor valor de fitness quedan al final
+    population = scored 
+    
+    # print(f"largo pop: {len(population)}")
+    # print(f"largo 1er el: {len(population[0])}")
+    # print(f"population: {population[0]}")
+    
+    # select 'n' last individuals, where n = pressure
     selected = scored[(len(scored) - pressure) : ] 
-    print(f"largo selected: {len(selected)}")
-    print(f"largo del 1er elemento: {len(selected[0])}")
-    print(f"selected: {selected[0]}")
+    # print(f"largo selected: {len(selected)}")
+    # print(f"largo del 1er elemento: {len(selected[0])}")
+    # print(f"selected: {selected[0]}")
     
     # crossover
     for i in range(len(population) - pressure):
@@ -123,18 +155,18 @@ def ga(target, dataset):
     global length
     length = len(X.columns)
     
-    print("length", length)
-    
-    print("creando poblacion")
     population = create_population()
     
-    print("reproducción y mutación")
     for i in range(0, generations):
+        print(f"generación {i+1}")
         population = selection_reproduction(population)
         population = mutation(population)
         
+    print(f"pop: {population[-1]}")
     print("fin ga()")
-    return population
+    # retorna el último individuo de la población, que es el que debería
+    # tener mayor valor de fitness
+    return population[-1]
 
 
 

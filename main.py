@@ -120,12 +120,12 @@ def string_to_int(lista):
 def run_boruta(target, control, secano, year):
     print("Running Boruta Algorithm...")
     elegidos_control = my_boruta.my_boruta_init(target, control)
-    print(f"Selected control: {elegidos_control}")
+    print(f"Selected control: {len(elegidos_control)} wavelength(s)\n{elegidos_control}")
     rangos_control = rangos_clustering(elegidos_control, "control", year, "boruta")
     print(f"Selected wavelength ranges (control set): {rangos_control}")
     print("")
     elegidos_secano = my_boruta.my_boruta_init(target, secano)
-    print(f"Selected water stress: {elegidos_secano}")
+    print(f"Selected water stress: {len(elegidos_secano)} wavelength(s)\n{elegidos_secano}")
     rangos_secano= rangos_clustering(elegidos_secano, "water stress", year, "boruta")
     print(f"Selected wavelength ranges (water stress set): {rangos_secano}")
     return
@@ -133,12 +133,12 @@ def run_boruta(target, control, secano, year):
 def run_lasso(target, control, secano, year):
     print("Running LASSO...")
     elegidos_control = lasso.lasso_init(target, control)
-    print(f"Selected control: {elegidos_control}")
+    print(f"Selected control: {len(elegidos_control)} wavelength(s)\n{elegidos_control}")
     rangos_control = rangos_clustering(elegidos_control, "control", year, "lasso")
     print(f"Selected wavelength ranges (control set): {rangos_control}")
     print("")
     elegidos_secano = lasso.lasso_init(target, secano)
-    print(f"Selected water stress: {elegidos_secano}")
+    print(f"Selected water stress: {len(elegidos_secano)} wavelength(s)\n{elegidos_secano}")
     rangos_secano = rangos_clustering(elegidos_secano, "water stress", year, "lasso")
     print(f"Selected wavelength ranges (water stress set): {rangos_secano}")
     return
@@ -146,12 +146,12 @@ def run_lasso(target, control, secano, year):
 def run_kbest_corr(target, control, secano, year):
     print("Running SelectK-Best (Correlation)...")
     elegidos_control = kbest.kbest_corr(target, control)
-    print(f"Selected control: {elegidos_control}")
+    print(f"Selected control: {len(elegidos_control)} wavelength(s)\n{elegidos_control}")
     rangos_control = rangos_clustering(elegidos_control, "control", year, "kbestcorr")
     print(f"Selected wavelength ranges (control set): {rangos_control}")
     print("")
     elegidos_secano = kbest.kbest_corr(target, secano)
-    print(f"Selected water stress: {elegidos_secano}")
+    print(f"Selected water stress: {len(elegidos_secano)} wavelength(s)\n{elegidos_secano}")
     rangos_secano = rangos_clustering(elegidos_secano, "water stress", year, "kbestcorr")
     print(f"Selected wavelength ranges (water stress set): {rangos_secano}")
     return
@@ -159,12 +159,12 @@ def run_kbest_corr(target, control, secano, year):
 def run_kbest_mi(target, control, secano, year):
     print("Running SelectK-Best (Mutual Information)...")
     elegidos_control = kbest.kbest_mi(target, control)
-    print(f"Selected control: {elegidos_control}")
+    print(f"Selected control: {len(elegidos_control)} wavelength(s)\n{elegidos_control}")
     rangos_control = rangos_clustering(elegidos_control, "control", year, "kbestmi")
     print(f"Selected wavelength ranges (control set): {rangos_control}")
     print("")
     elegidos_secano = kbest.kbest_mi(target, secano)
-    print(f"Selected water stress: {elegidos_secano}")
+    print(f"Selected water stress: {len(elegidos_secano)} wavelength(s)\n{elegidos_secano}")
     rangos_secano = rangos_clustering(elegidos_secano, "water stress", year, "kbestmi")
     print(f"Selected wavelength ranges (water stress set): {rangos_secano}")
     return
@@ -172,12 +172,12 @@ def run_kbest_mi(target, control, secano, year):
 def run_ga(target, control, secano, year):
     print("Running Genetic Algorithm...")
     elegidos_control = ga.ga(target, control)
-    print(f"Selected control: {elegidos_control}")
+    print(f"Selected control: {len(elegidos_control)} wavelength(s)\n{elegidos_control}")
     rangos_control = rangos_clustering(elegidos_control, "control", year, "ga")
     print(f"Selected wavelength ranges (control set): {rangos_control}")
     print("")
     elegidos_secano = ga.ga(target, secano)
-    print(f"Selected water stress: {elegidos_secano}")
+    print(f"Selected water stress: {len(elegidos_secano)} wavelength(s)\n{elegidos_secano}")
     rangos_secano = rangos_clustering(elegidos_secano, "water stress", year, "ga")
     print(f"Selected wavelength ranges (water stress set): {rangos_secano}")
     return
@@ -188,8 +188,8 @@ def main(argv):
     # default values for line commands
     years_default = [2014, 2015, 2016, 2017]
     target = 'Chl'
-    alg = 'ga'
-    year = '2014'
+    alg = 'all'
+    year = 'all'
     
     str_help = """Usage:
 main.py -t <target> [-a <algorithm> -y <year>]
@@ -235,9 +235,9 @@ Years available: 2014, 2015, 2016 and 2017."""
             
     if year != 'all' and alg != 'all': 
         
+        print(f"Year {year}\n:")
         print("Extracting data...")
         control, secano = data_preprocessing.data_any_year(target, int(year))
-        print(f"Year {year}:")
         
         if alg == 'boruta':
             start = time.perf_counter()
@@ -273,18 +273,18 @@ Years available: 2014, 2015, 2016 and 2017."""
         print("Extracting data...")
         time_total = 0
         for i in range(len(years_default)):
+            print(f"\nYear: {years_default[i]}\n")
             control, secano = data_preprocessing.data_any_year(target, years_default[i])
             start = time.perf_counter()
-            print(f"Year: {years_default[i]} ")
-            run_kbest_corr(target, control, secano, year)
+            run_kbest_corr(target, control, secano, years_default[i])
             print("")
-            run_kbest_mi(target, control, secano, year)
+            run_kbest_mi(target, control, secano, years_default[i])
             print("")
-            run_boruta(target, control, secano, year)
+            run_boruta(target, control, secano, years_default[i])
             print("")
-            run_lasso(target, control, secano, year)
+            run_lasso(target, control, secano, years_default[i])
             print("")
-            run_ga(target, control, secano, year)
+            # run_ga(target, control, secano, years_default[i])
             end = time.perf_counter()
             time_total = time_total + (end - start)
         print(f"Execution time: {time_total:0.2f} seconds.")
