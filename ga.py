@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import random
 import pandas
-import numpy as np
 
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
-from sklearn.metrics import mean_squared_error
 
 
 model_target = 0.3 # r2 target
@@ -93,9 +91,9 @@ def selection_reproduction(population):
     
     scored = [(fitness_func(i), i) for i in population] # ex: (5, [1, 0, 0, 1, ...])
     
-    print(f"largo scored1: {len(scored)}")
-    print(f"largo del 1er elemento: {len(scored[0])}")
-    print(f"scored1 last: {scored[-1]}")
+    # print(f"largo scored1: {len(scored)}")
+    # print(f"largo del 1er elemento: {len(scored[0])}")
+    # print(f"scored1 last: {scored[-1]}")
     
     # ordena en forma ascendente según su valor de fitness y se queda solo 
     # con los individuos
@@ -158,15 +156,21 @@ def ga(target, dataset):
     population = create_population()
     
     for i in range(0, generations):
-        print(f"generación {i+1}")
+        # print(f"generación {i+1}")
         population = selection_reproduction(population)
         population = mutation(population)
         
-    print(f"pop: {population[-1]}")
-    print("fin ga()")
+    # print(f"pop: {population[-1]}")
+    # print("fin ga()")
     # retorna el último individuo de la población, que es el que debería
-    # tener mayor valor de fitness
-    return population[-1]
+    # tener mayor valor de fitness, convertido en lista de atributos elegidos
+    best_ind = population[-1]
+    selected = []
+    for i in range(len(best_ind)):
+        if best_ind[i] == 1:
+            selected.append(i + 350)
+    
+    return selected
 
 
 

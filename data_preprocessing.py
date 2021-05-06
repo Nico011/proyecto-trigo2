@@ -58,6 +58,21 @@ def data_any_year(target, year):
     control = pandas.concat([df_target_control.reset_index(drop=True), df_firma_control], axis = 1)
     water_stress = pandas.concat([df_target_water_stress.reset_index(drop=True), df_firma_water_stress], axis = 1)
     
+    # count outliers for control
+    c_q1 = control.loc[ : , target].quantile(0.25)
+    c_q3 = control.loc[ : , target].quantile(0.75)
+    c_iqr = c_q3 - c_q1
+    
+    print(f"Outliers in target column (control set):\n{((control.loc[ : , target] < (c_q1 - 1.5 * c_iqr)) | (control.loc[ : , target] > (c_q3 + 1.5 * c_iqr))).sum()}")
+    
+    # count outliers for water stress
+    ws_q1 = water_stress.loc[ : , target].quantile(0.25)
+    ws_q3 = water_stress.loc[ : , target].quantile(0.75)
+    ws_iqr = ws_q3 - ws_q1
+    
+    print(f"Outliers in target column (water stress set):\n{((water_stress.loc[ : , target] < (ws_q1 - 1.5 * ws_iqr)) | (water_stress.loc[ : , target] > (ws_q3 + 1.5 * ws_iqr))).sum()}")
+    
+    # show number of NaN in datasets
     print("Number of NaN (control dataset):", control.isna().sum().sum())
     print("Number of NaN (water stress dataset):", water_stress.isna().sum().sum())
     
