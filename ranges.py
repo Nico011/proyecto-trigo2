@@ -13,7 +13,7 @@ import pandas
 # into a set of ranges.
 # Original algorithm from:
 # https://stackoverflow.com/questions/42415595/group-numbers-into-ranges-in-python
-def rangos_clustering(selected, state, year, alg):
+def rangos_clustering(target, selected, state, year, alg):
     # returns nothing when list is empty
     if len(selected) == 0:
         print("None")
@@ -64,8 +64,16 @@ def rangos_clustering(selected, state, year, alg):
         for j in range(len(clustered_index[i])):
             wavelen_clustered[i][j] = selected[clustered_index[i][j]]
         print(f"Cluster {i+1:}")
+        aux_cluster = pandas.Series(wavelen_clustered[i])
+        statistics = [["count", aux_cluster.count()],
+                      ["mean", aux_cluster.mean()],
+                      ["median", aux_cluster.median()],
+                      ["std", aux_cluster.std()],
+                      ["min", aux_cluster.min()],
+                      ["max", aux_cluster.max()]]
         print(f"{wavelen_clustered[i]}")
-        print(f"{pandas.Series(wavelen_clustered[i]).describe()[['count', 'mean', 'std', 'min', 'max']]}")
+        print(pandas.DataFrame(statistics, index = ["", "", "", "", "", ""], columns = ["", ""]))
+        print("")
         
     # create a new list, then for each list of indexes replace min and max for
     # the data value to express it as a range.
@@ -78,11 +86,11 @@ def rangos_clustering(selected, state, year, alg):
     # Boxplot of the clusters
     bp = plt.figure().gca()
     plt.boxplot(wavelen_clustered, vert = 0)
-    plt.xlim(350, 2500)
+    # plt.xlim(350, 2500)
     bp.xaxis.set_major_locator(MaxNLocator(integer = True))
     plt.yticks([i + 1 for i in range(tot_clusters)], rngs)
-    plt.title(f"Boxplot {state}, {year}")
-    plt.savefig(f"{alg}-{state}-{year}.png")  
+    plt.title(f"Boxplot {target}-{state}, {year}")
+    plt.savefig(f"{target}-{alg}-{state}-{year}.png")  
     
     # return the sorted list of ranges
     # ex: [(350, 370), (600, 750), ...]

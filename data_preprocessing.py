@@ -75,6 +75,7 @@ def data_any_year(target, year):
     # show number of NaN in datasets
     print("Number of NaN (control dataset):", control.isna().sum().sum())
     print("Number of NaN (water stress dataset):", water_stress.isna().sum().sum())
+    print("")
     
     # drop rows with NAs
     control.dropna(inplace = True)
