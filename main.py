@@ -6,7 +6,8 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 
-from plotnine import ggplot, aes, geom_line
+from plotnine import ggplot, aes, labs, geom_line, geom_vline, geom_rect, geom_text
+from sklearn.preprocessing import StandardScaler
 
 import time
 import sys
@@ -21,13 +22,36 @@ import ga
 import ranges
 
 
-def graphics(target, control, water_stress):
-    control_sample = control.sample(frac = 0.1, random_state = 1)
+def graphics(target, control, ranges_control, water_stress, ranges_water_stress):
+    control_sample = control.loc[ : , "350":"2499"].sample(frac = 0.1, random_state = 1)
     
-    print("intentando graficar")
+    control_sample_t = control_sample.transpose()
     
-    ggplot(control_sample) + aes(x = "Wavelength (nm)", y = "Reflectance (%)") + geom_line()
+    # vlines = []
+    # for i in range(len(ranges_control)):
+    #     for j in range(len(ranges_control[i])):
+    #         vlines.append(ranges_control[i][j])
     
+    g = ggplot(control_sample_t) \
+        + aes(x = [i for i in range(350, 2500)], y = control_sample_t.iloc[ : , 1]) \
+        +labs(
+            x = "Wavelength (nm)",
+            y = "Reflectance %",
+            title = "Ranges selected in a spectral signature (standardized)"
+            ) 
+        
+    for i in range(len(ranges_control)):
+        i_range = []
+        for j in range(len(ranges_control[i])):
+            g = g + geom_vline(xintercept = ranges_control[i][j], color="black", alpha = 0) 
+                # + geom_text(mapping = aes(x = ranges_control[i][j], y = 2.5, label=str(ranges_control[i][j])), size = 6)
+            i_range.append(ranges_control[i][j])
+        g = g + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = -2, ymax = 2), fill = "steelblue", alpha = 0.1)
+    g = g + geom_line()
+    
+    print(g)
+    g.save(filename = f"ranges control {target}")
+   
     return
 
 
@@ -74,7 +98,7 @@ def run_kbest_corr(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "kbestcorr")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    graphics(target, control, water_stress)
+    graphics(target, control, rangos_control, water_stress, rangos_water_stress)
     return
 
 def run_kbest_mi(target, control, water_stress, year):

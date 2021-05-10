@@ -37,7 +37,7 @@ def data_any_year(target, year):
     df_firma_control = filter_control.loc[ : , "350":"2499"]
     cols = list(df_firma_control.columns.values) 
     
-    # Standardize signature
+    # Standardize signature (z-score)
     # the standard score of the sample x is calculated as:
     # z = (x - u)/s
     # where u is the mean of the training samples,
@@ -59,6 +59,7 @@ def data_any_year(target, year):
     water_stress = pandas.concat([df_target_water_stress.reset_index(drop=True), df_firma_water_stress], axis = 1)
     
     # count outliers for control
+    # https://stackoverflow.com/questions/39068214/how-to-count-outliers-for-all-columns-in-python
     c_q1 = control.loc[ : , target].quantile(0.25)
     c_q3 = control.loc[ : , target].quantile(0.75)
     c_iqr = c_q3 - c_q1
