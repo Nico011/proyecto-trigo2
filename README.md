@@ -3,12 +3,12 @@
 
 ## Resumen
 ### Motivación
-El trigo, junto al maíz, arroz y otros cereales, son la base alimenticia de la civilización y su cultivo se enfrenta a grandes problemas como: poder entregar un alto valor nutritivo, alcanzar en términs de cantidad para una población en constante crecimiento, disminuir el impacto ambiental que conlleva cumplir los requisitos mencionados. La selección de plantas en etapas tempranas de desarrollo para producción o cruce ahorraría bastante tiempo y recursos a los investigadores, por eso este trabajo busca encontrar indicadores para realizar dicha selección.
+El trigo, junto al maíz, arroz y otros cereales, son la base alimenticia de la civilización y su cultivo se enfrenta a grandes problemas como: poder entregar un alto valor nutritivo, alcanzar en términos de cantidad para una población en constante crecimiento, disminuir el impacto ambiental que conlleva cumplir los requisitos mencionados. La selección de plantas en etapas tempranas de desarrollo para producción o cruce ahorraría bastante tiempo y recursos a los investigadores, por eso este trabajo busca encontrar indicadores para realizar dicha selección.   
+Una firma espectral es la variación de reflectancia de un material respecto a la longitud de onda, es medida con un espectómetro y a través de esta firma es posible conocer la estructura y composición de dicho material, así que se usa en distintos campos de la ciencia. Este trabajo se enfoca en su uso en la agronomía, en específico, la medición de la firma espectral de la planta de trigo, ya que esta medición podría entregar información sobre la salud o fisiología de la planta [3].
 
 
 ### Objetivo general
-Encontrar rangos de longitudes de onda en la medición hiper-espectral que describan características fisiológicas del trigo.
-(Pequeño párrafo de explicación)
+Encontrar rangos de longitudes de onda en la firma espectral que describan características fisiológicas del trigo.
 
 
 ### Objetivo específico
@@ -19,10 +19,10 @@ Aplicar algoritmos de selección de atributos sobre la firma hiper-espectral par
 ¿Es posible identificar rangos de longitud de onda de la firma hiper-espectral que permitan estimar variables fisiológicas del trigo utilizando algoritmos de selección de atributos?
 
 
-### Datos y métodos (separar datos y métodos)
-Los datos para este proyecto contienen observaciones fisiológicas, de fluorescencia de la clorofila y firma hiper-espectral de distintos genotipos de trigo, en distintas etapas de madurez, condición de riego y lugar geográfico, las que fueron tomadas entre los años 2014 y 2017 (agregar cita [1]). Los métodos de obtención de los datos varían entre mediciones de campo o en laboratorio. Para el caso de la firma hiper-espectral se decidió usar las medidas tomadas con reflectómetro de clip, que mide la reflectancia entre 350 a 2500nm directamente desde la hoja y no percibe ruido.
-Los datos se encuentran en el archivo **data-total.csv**. Este archivo combina las medidas tomadas los cuatro años antes mencionados, de ambas localidades (Cauquenes y Santa Rosa). De las columnas se pueden separar en cuatro grupos: el primero contiene datos sobre la medición (ID, fecha, condición de riego, parcela, etc); un segundo grupo con las variables fisiológicas de cada medición (clorofila, flavonoides, conductancia estomática, etc.); un tercer grupo con meddiciones de fluorescencia de la clorfila; y por último, las columnas que contienen las medidas de reflectancia donde cada columna es una longitud de onda desde 350 a 2500nm. Dando un total de 2197 columnas y 1579 observaciones.
-Para este se consideran los grupos dos y tres como variables objetivos y predictores respectivamente. En caso de existir datos faltantes se elimina la fila.
+### Datos
+Los datos para este proyecto contienen observaciones fisiológicas, de fluorescencia de la clorofila y firma hiper-espectral de distintos genotipos de trigo, en distintas etapas de madurez, condición de riego y lugar geográfico, las que fueron tomadas entre los años 2014 y 2017 [1]. Los métodos de obtención de los datos varían entre mediciones de campo o en laboratorio. Para el caso de la firma hiper-espectral se decidió usar las medidas tomadas con reflectómetro de clip, que mide la reflectancia entre 350 a 2500nm directamente desde la hoja y no percibe ruido.    
+Los datos se encuentran en el archivo **data-total.csv**. Este archivo combina las medidas tomadas los cuatro años antes mencionados, de ambas localidades (Cauquenes y Santa Rosa). De las columnas se pueden separar en cuatro grupos: el primero contiene datos sobre la medición (ID, fecha, condición de riego, parcela, etc); un segundo grupo con las variables fisiológicas de cada medición (clorofila, flavonoides, conductancia estomática, etc.); un tercer grupo con meddiciones de fluorescencia de la clorfila; y por último, las columnas que contienen las medidas de reflectancia donde cada columna es una longitud de onda desde 350 a 2500nm. Dando un total de 2197 columnas y 1579 observaciones.    
+Para este se consideran los grupos de variables fisiológicas y medidas de reflectancia como variables objetivos y predictores respectivamente. En caso de existir datos faltantes se elimina la fila.
 
 Ejemplo de dataframe de los datos antes de filtrar:
 
@@ -42,7 +42,12 @@ Ejemplo de dataframe de los datos antes de filtrar:
 
 [1579 rows x 2197 columns]
 ```
-Ejemplo de dataframe luego de filtrar:
+
+
+### Métodos
+El método de preprocesamiento consta de filtrar los datos, sepárandolos por año y por estado hídrico (irrigación completa o control y secano o estrés hídrico) y se estandarizan las columnas predictoras calculando los z-scores.
+
+Ejemplo de dataframe luego de filtrar para el año 2014, grupo control, estandarizada y cuya variable objetivo es Chl (clorofila):
 
 ```
        Chl       350       351  ...      2497      2498      2499
@@ -60,17 +65,32 @@ Ejemplo de dataframe luego de filtrar:
 
 [128 rows x 2151 columns]
 ```
-Para este ejemplo, se muestran los datos del año 2014 de las plantas de riego. La variable objetivo en este caso es clorofila (Chl) y se han estandarizado los valores de las columnas predictoras (el valor estandarizado es dado por el resultado (de z score) de `(x - u) / s`, donde `x` es el valor antes de estandarizar, `u` es el promedio y `s` la desviación estándar. Por falta de datos, se dejó fuera la columna para la longitud de onda 2500.
-agregar cita
-agregar otras posibles variables objetivo
-falta método (de de machine learning: regresión, preprocesamiento, unidades de medición, validación, especificar la selección de atributos(algoritmos que se utilizaron)
+Por falta de datos, se eliminó la columna para la longitud de onda 2500.   
+Las posibles variables objetivo son: Chl, Flav, Anth, NBI, Pot.Hoja(Bar), Transmitted, LAI, EVAP, GS, PN, CI y VPD.   
+Se implementaron distintos algoritmos de selección de atributos para seleccionar longitudes de onda importantes, con el objetivo de reducir la dimensionalidad del problema, entender mejor los datos, reducir los requisitos de cómputo y mejorar el rendimiento de los predictores [2], los que se listan a continuación:
+* Algoritmo Boruta.
+* Least absolute shrinkage and selection operator (LASSO).
+* SelectkBest.
+* Algoritmo genético.   
+
+La lista de atributos considerados como importantes por estos algoritmos se entregan como parámetro a una función de clusterización jerárquico aglomerativo que los agrupa según su distancia, y luego obteniendo el mínimo y máximo de cada clúster retorna una lista con los rangos de longitudes de onda que caracterízarían a la variable entregada como objetivo.    
+Los métodos de regresión son:
+* PLS.
+* SVR.
+* Regresión logística.
+* Ridge.   
+
+(Falta unidades de medición y validación)
 
 
 ### Resultados esperados
 Se espera que los distintos algoritmos usados entreguen rangos similares para las mismas variables fisiológicas, estos rangos funcionarían como indicadores característicos y ayudarían a optimizar la lectura de la firma hiper-espectral.
 
 
-## EL programa
+### Resultados específicos
+
+
+## El programa en Python
 ### Los algoritmos de selección de atributos
 Se han implementado 4 algoritmos de selección de atributos, divididos en distintos archivos. A continuación se listan los módulos y los algoritmos que contiene cada uno:
 * my_boruta.py: Algoritmo Boruta.
@@ -78,6 +98,7 @@ Se han implementado 4 algoritmos de selección de atributos, divididos en distin
 * kbest.py: Algoritmo Select K-Best, utilizando dos funciones de score,
   * Mutual information: Función kbest_mi().
   * Correlation: Función kbest_corr().
+* ga.py: Algoritmo genético para selección de atributos.
 
 ### Uso
 Abrir el archivo `main.py` desde la terminal y entregar los parámetros:
@@ -86,7 +107,7 @@ Abrir el archivo `main.py` desde la terminal y entregar los parámetros:
 
 En caso de especificar un algorito es necesario especificar un año, en caso contrario se ejecutarán todos los algoritmos para todos los años. Se puede no especificar el target y tomará la clorofila (Chl) por default.
 
-Targets disponibles: Chl, Flav, Anth, NBI, Pot.Hoja(Bar), Transmitted, LAI, EVAP, GS, PN, CI, VPD, 1000G-gr, G-espiga, Esp_m2, IC, ALT, PHECT, Rto_ton_ha, BiomasaTon_ha.
+Targets disponibles: Chl, Flav, Anth, NBI, Pot.Hoja(Bar), Transmitted, LAI, EVAP, GS, PN, CI, VPD.
 
 Algoritmos disponibles: 
 * boruta: Ejecuta algoritmo Boruta.
@@ -100,7 +121,5 @@ Puede usar el comando `-h` o `--help` para obtener una ayuda similar a la descri
 
 Ej: `main.py --help`
 
-### Referencias
-* S. Romero-Bravo et al., “Thermal Imaginig Reliability for Estimating Grain Yield and Carbon Isotope Discrimination in Wheat Genotypes: Importance of the Enviromental Conditions,” pp. 1–16.
-* G. Chandrashekar and F. Sahin, “A survey on feature selection methods,” Comput. Electr. Eng., vol. 40, no. 1, pp. 16–28, 2014, doi: 10.1016/j.compeleceng.2013.11.024.
-* J. Luo et al., “Evaluation of spectral indices and continuous wavelet analysis to quantify aphid infestation in wheat,” Precis. Agric., vol. 14, no. 2, pp. 151–161, 2013, doi: 10.1007/s11119-012-9283-4.
+[1]: https://www.mdpi.com/1424-8220/19/12/2676?type=check_update&version=2 'S. Romero-Bravo et al., “Thermal Imaginig Reliability for Estimating Grain Yield and Carbon Isotope Discrimination in Wheat Genotypes: Importance of the Enviromental Conditions,” pp. 1–16.'
+[2]: https://www.sciencedirect.com/science/article/abs/pii/S0045790613003066?via%3Dihub 'G. Chandrashekar and F. Sahin, “A survey on feature selection methods,” Comput. Electr. Eng., vol. 40, no. 1, pp. 16–28, 2014, doi: 10.1016/j.compeleceng.2013.11.024.'

@@ -6,8 +6,7 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 
-from plotnine import ggplot, aes, labs, geom_line, geom_vline, geom_rect, geom_text
-from sklearn.preprocessing import StandardScaler
+from plotnine import ggplot, aes, labs, geom_line, geom_vline, geom_rect
 
 import time
 import sys
@@ -23,16 +22,15 @@ import ranges
 
 
 def graphics(target, control, ranges_control, water_stress, ranges_water_stress):
+    
+    # Graphics for control set
     control_sample = control.loc[ : , "350":"2499"].sample(frac = 0.1, random_state = 1)
     
     control_sample_t = control_sample.transpose()
+    y_min = min(control_sample_t.iloc[ : , 1])
+    y_max = max(control_sample_t.iloc[ : , 1])
     
-    # vlines = []
-    # for i in range(len(ranges_control)):
-    #     for j in range(len(ranges_control[i])):
-    #         vlines.append(ranges_control[i][j])
-    
-    g = ggplot(control_sample_t) \
+    graph_ctrl = ggplot(control_sample_t) \
         + aes(x = [i for i in range(350, 2500)], y = control_sample_t.iloc[ : , 1]) \
         +labs(
             x = "Wavelength (nm)",
@@ -43,15 +41,40 @@ def graphics(target, control, ranges_control, water_stress, ranges_water_stress)
     for i in range(len(ranges_control)):
         i_range = []
         for j in range(len(ranges_control[i])):
-            g = g + geom_vline(xintercept = ranges_control[i][j], color="black", alpha = 0) 
-                # + geom_text(mapping = aes(x = ranges_control[i][j], y = 2.5, label=str(ranges_control[i][j])), size = 6)
+            graph_ctrl = graph_ctrl + geom_vline(xintercept = ranges_control[i][j], color="black", alpha = 0) 
             i_range.append(ranges_control[i][j])
-        g = g + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = -2, ymax = 2), fill = "steelblue", alpha = 0.1)
-    g = g + geom_line()
+        graph_ctrl = graph_ctrl + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = y_min, ymax = y_max), fill = "steelblue", alpha = 0.1)
+    graph_ctrl = graph_ctrl + geom_line()
     
-    print(g)
-    g.save(filename = f"ranges control {target}")
+    print(graph_ctrl)
+    graph_ctrl.save(filename = f"ranges control {target}")
    
+    # Graphics for water stress set
+    ws_sample = water_stress.loc[ : , "350":"2499"].sample(frac = 0.1, random_state = 1)
+    
+    ws_sample_t = ws_sample.transpose()
+    
+    y_min = min(ws_sample_t.iloc[ : , 1])
+    y_max = max(ws_sample_t.iloc[ : , 1])
+    
+    graph_ws = ggplot(ws_sample_t) \
+        + aes(x = [i for i in range(350, 2500)], y = ws_sample_t.iloc[ : , 1]) \
+        +labs(
+            x = "Wavelength (nm)",
+            y = "Reflectance %",
+            title = "Ranges selected in a spectral signature (standardized)"
+            ) 
+        
+    for i in range(len(ranges_water_stress)):
+        i_range = []
+        for j in range(len(ranges_water_stress[i])):
+            graph_ws = graph_ws + geom_vline(xintercept = ranges_water_stress[i][j], color="black", alpha = 0) 
+            i_range.append(ranges_water_stress[i][j])
+        graph_ws = graph_ws + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = y_min, ymax = y_max), fill = "steelblue", alpha = 0.1)
+    graph_ws = graph_ws + geom_line()
+    
+    print(graph_ws)
+    graph_ws.save(filename = f"ranges water stress {target}")
     return
 
 
@@ -72,6 +95,7 @@ def run_boruta(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress= ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "boruta")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
+    graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
     return
 
 def run_lasso(target, control, water_stress, year):
@@ -85,6 +109,7 @@ def run_lasso(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "lasso")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
+    graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
     return
 
 def run_kbest_corr(target, control, water_stress, year):
@@ -98,7 +123,7 @@ def run_kbest_corr(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "kbestcorr")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    graphics(target, control, rangos_control, water_stress, rangos_water_stress)
+    graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
     return
 
 def run_kbest_mi(target, control, water_stress, year):
@@ -112,6 +137,7 @@ def run_kbest_mi(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "kbestmi")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
+    graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
     return
 
 def run_ga(target, control, water_stress, year):
@@ -125,6 +151,7 @@ def run_ga(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "ga")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
+    graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
     return
 
 # Main function
@@ -133,7 +160,7 @@ def main(argv):
     years_default = [2014, 2015, 2016, 2017]
     target = 'Chl'
     alg = 'kbestcorr'
-    year = '2017'
+    year = '2014'
     
     str_help = """Usage:
 main.py -t <target> [-a <algorithm> -y <year>]
@@ -234,7 +261,7 @@ Years available: 2014, 2015, 2016 and 2017."""
             time_total = time_total + (end - start)
         print(f"Execution time: {time_total:0.2f} seconds.")
     
-    print(f"Boxplot graphs saved as image in current working directory ({os.getcwd()})")
+    print(f"Boxplot and graphs saved as image in current working directory ({os.getcwd()})")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
