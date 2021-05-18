@@ -91,6 +91,7 @@ def rangos_clustering(target, selected, state, year, alg):
     plt.yticks([i + 1 for i in range(tot_clusters)], rngs)
     plt.title(f"Boxplot {target}-{state}, {year}")
     plt.savefig(f"{target}-{alg}-{state}-{year}.png")  
+    plt.show()
     
     # return the sorted list of ranges
     # ex: [(350, 370), (600, 750), ...]

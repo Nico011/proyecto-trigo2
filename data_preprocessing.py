@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import pandas
-import matplotlib.pyplot as plt
-import seaborn
 from sklearn.preprocessing import StandardScaler
 
 # Data preprocessing for a year given as parameter
@@ -42,7 +40,7 @@ def data_any_year(target, year):
     # z = (x - u)/s
     # where u is the mean of the training samples,
     # and s is the standard deviation of the training samples
-    df_firma_control = pandas.DataFrame(StandardScaler().fit_transform(df_firma_control))
+    # df_firma_control = pandas.DataFrame(StandardScaler().fit_transform(df_firma_control))
     
     # assign column names to dataframe
     df_firma_control.columns = cols
@@ -84,3 +82,22 @@ def data_any_year(target, year):
     
     # return control dataframe and water stress dataframe
     return control, water_stress
+
+
+# Return dataset only with signature to long format
+def wide_to_long(wide_dataset):
+    # print("head de la tabla inicial")
+    # print(wide_dataset.head())
+    wide_dataset_t = wide_dataset.transpose()
+    wide_dataset_t.index.name = "wavelength"
+    # print("head de la tabla transpuesta")
+    # print(wide_dataset_t.head())
+    wide_dataset_t.reset_index(inplace = True)
+    long_dataset = pandas.melt(
+        wide_dataset_t,
+        id_vars = "wavelength"
+        )
+    print("head de la tabla long: ")
+    print(long_dataset.head())
+    
+    return long_dataset

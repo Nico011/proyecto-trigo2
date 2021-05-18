@@ -6,8 +6,10 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 
-from plotnine import ggplot, aes, labs, geom_line, geom_vline, geom_rect
+from plotnine import ggplot, aes, labs, geom_line, theme#, geom_vline, geom_rect
+import matplotlib.pyplot as plt
 
+import pandas
 import time
 import sys
 import getopt
@@ -21,62 +23,79 @@ import ga
 import ranges
 
 
-def graphics(target, control, ranges_control, water_stress, ranges_water_stress):
+def ranges_graphics(control, ranges_control):
     
     # Graphics for control set
-    control_sample = control.loc[ : , "350":"2499"].sample(frac = 0.1, random_state = 1)
+    # control_sample = control.loc[ : , "350":"2499"].sample(frac = 0.1, random_state = 1)
     
-    control_sample_t = control_sample.transpose()
-    y_min = min(control_sample_t.iloc[ : , 1])
-    y_max = max(control_sample_t.iloc[ : , 1])
+    # control_sample_t = control_sample.transpose()
+    # y_min = min(control_sample_t.iloc[ : , 1])
+    # y_max = max(control_sample_t.iloc[ : , 1])
     
-    graph_ctrl = ggplot(control_sample_t) \
-        + aes(x = [i for i in range(350, 2500)], y = control_sample_t.iloc[ : , 1]) \
+    control["wavelength"] = pandas.to_numeric(control["wavelength"])
+    control["value"] = pandas.to_numeric(control["value"])
+    
+    graph_ctrl = ggplot(control) \
+        + theme(legend_position = "none") \
+        + aes(x = "wavelength", y = "value", color = "variable") \
         +labs(
             x = "Wavelength (nm)",
-            y = "Reflectance %",
-            title = "Ranges selected in a spectral signature (standardized)"
+            y = "Reflectance (%)",
+            title = "ggplot"
             ) 
         
-    for i in range(len(ranges_control)):
-        i_range = []
-        for j in range(len(ranges_control[i])):
-            graph_ctrl = graph_ctrl + geom_vline(xintercept = ranges_control[i][j], color="black", alpha = 0) 
-            i_range.append(ranges_control[i][j])
-        graph_ctrl = graph_ctrl + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = y_min, ymax = y_max), fill = "steelblue", alpha = 0.1)
+    # for i in range(len(ranges_control)):
+    #     i_range = []
+    #     for j in range(len(ranges_control[i])):
+    #         graph_ctrl = graph_ctrl + geom_vline(xintercept = ranges_control[i][j], color="black", alpha = 0) 
+    #         i_range.append(ranges_control[i][j])
+    #     graph_ctrl = graph_ctrl + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = 0.0, ymax = 1.0, fill = "steelblue", alpha = 0.1))
     graph_ctrl = graph_ctrl + geom_line()
     
     print(graph_ctrl)
-    graph_ctrl.save(filename = f"ranges control {target}")
+    graph_ctrl.save(filename = "ranges control Chl")
    
     # Graphics for water stress set
-    ws_sample = water_stress.loc[ : , "350":"2499"].sample(frac = 0.1, random_state = 1)
+    # ws_sample = water_stress.loc[ : , "350":"2499"].sample(frac = 0.1, random_state = 1)
     
-    ws_sample_t = ws_sample.transpose()
+    # ws_sample_t = ws_sample.transpose()
     
-    y_min = min(ws_sample_t.iloc[ : , 1])
-    y_max = max(ws_sample_t.iloc[ : , 1])
+    # y_min = min(ws_sample_t.iloc[ : , 1])
+    # y_max = max(ws_sample_t.iloc[ : , 1])
     
-    graph_ws = ggplot(ws_sample_t) \
-        + aes(x = [i for i in range(350, 2500)], y = ws_sample_t.iloc[ : , 1]) \
-        +labs(
-            x = "Wavelength (nm)",
-            y = "Reflectance %",
-            title = "Ranges selected in a spectral signature (standardized)"
-            ) 
+    # graph_ws = ggplot(ws_sample_t) \
+    #     + aes(x = [i for i in range(350, 2500)], y = ws_sample_t.iloc[ : , 1]) \
+    #     +labs(
+    #         x = "Wavelength (nm)",
+    #         y = "Reflectance %",
+    #         title = "Ranges selected in a spectral signature (standardized)"
+    #         ) 
         
-    for i in range(len(ranges_water_stress)):
-        i_range = []
-        for j in range(len(ranges_water_stress[i])):
-            graph_ws = graph_ws + geom_vline(xintercept = ranges_water_stress[i][j], color="black", alpha = 0) 
-            i_range.append(ranges_water_stress[i][j])
-        graph_ws = graph_ws + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = y_min, ymax = y_max), fill = "steelblue", alpha = 0.1)
-    graph_ws = graph_ws + geom_line()
+    # for i in range(len(ranges_water_stress)):
+    #     i_range = []
+    #     for j in range(len(ranges_water_stress[i])):
+    #         graph_ws = graph_ws + geom_vline(xintercept = ranges_water_stress[i][j], color="black", alpha = 0) 
+    #         i_range.append(ranges_water_stress[i][j])
+    #     graph_ws = graph_ws + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = y_min, ymax = y_max), fill = "steelblue", alpha = 0.1)
+    # graph_ws = graph_ws + geom_line()
     
-    print(graph_ws)
-    graph_ws.save(filename = f"ranges water stress {target}")
+    # print(graph_ws)
+    # graph_ws.save(filename = f"ranges water stress {target}")
+    
+    
+    # using matplotlib
+    plt.plot(control["wavelength"], control["value"])
+    plt.title("matplotlib")
+    plt.xlabel("Wavelength (nm)")
+    plt.ylabel("Reflectance (%)")
+    plt.savefig("graph.png")
+    # plt.grid(True)
+    plt.show()
     return
 
+def ranges_graphics_matplotlib(target, control, ranges_control, water_stress, ranges_water_stress, year):
+    
+    return
 
 # The following functions run each algorithm available and prints their results.
 # They all work about the same. They receive as parameters the target (string),
@@ -95,7 +114,7 @@ def run_boruta(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress= ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "boruta")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
+    # graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
     return
 
 def run_lasso(target, control, water_stress, year):
@@ -109,7 +128,7 @@ def run_lasso(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "lasso")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
+    # graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
     return
 
 def run_kbest_corr(target, control, water_stress, year):
@@ -123,7 +142,7 @@ def run_kbest_corr(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "kbestcorr")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
+    # graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
     return
 
 def run_kbest_mi(target, control, water_stress, year):
@@ -137,7 +156,8 @@ def run_kbest_mi(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "kbestmi")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
+    control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
+    ranges_graphics(control_long, rangos_control)
     return
 
 def run_ga(target, control, water_stress, year):
@@ -151,7 +171,7 @@ def run_ga(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "ga")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
+    # graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
     return
 
 # Main function
@@ -159,7 +179,7 @@ def main(argv):
     # default values for line commands
     years_default = [2014, 2015, 2016, 2017]
     target = 'Chl'
-    alg = 'kbestcorr'
+    alg = 'kbestmi'
     year = '2014'
     
     str_help = """Usage:
