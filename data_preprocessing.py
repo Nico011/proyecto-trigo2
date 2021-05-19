@@ -49,7 +49,7 @@ def data_any_year(target, year):
     df_firma_water_stress = filter_water_stress.loc[ : , "350":"2499"]
     
     # Estandadize water_stress
-    df_firma_water_stress = pandas.DataFrame(StandardScaler().fit_transform(df_firma_water_stress)) 
+    # df_firma_water_stress = pandas.DataFrame(StandardScaler().fit_transform(df_firma_water_stress)) 
     df_firma_water_stress.columns = cols
     
     # join target column to predictors
@@ -86,18 +86,14 @@ def data_any_year(target, year):
 
 # Return dataset only with signature to long format
 def wide_to_long(wide_dataset):
-    # print("head de la tabla inicial")
-    # print(wide_dataset.head())
+    
     wide_dataset_t = wide_dataset.transpose()
     wide_dataset_t.index.name = "wavelength"
-    # print("head de la tabla transpuesta")
-    # print(wide_dataset_t.head())
+    
     wide_dataset_t.reset_index(inplace = True)
     long_dataset = pandas.melt(
         wide_dataset_t,
         id_vars = "wavelength"
         )
-    print("head de la tabla long: ")
-    print(long_dataset.head())
     
     return long_dataset

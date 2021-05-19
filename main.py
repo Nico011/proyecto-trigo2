@@ -6,8 +6,7 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 
-from plotnine import ggplot, aes, labs, geom_line, theme#, geom_vline, geom_rect
-import matplotlib.pyplot as plt
+from plotnine import ggplot, aes, labs, geom_line, theme, geom_vline, geom_rect, geom_text
 
 import pandas
 import time
@@ -23,19 +22,15 @@ import ga
 import ranges
 
 
-def ranges_graphics(control, ranges_control):
+# Graphics for spectral signatures    
+def ranges_graphics(signatures_long, ranges):
     
-    # Graphics for control set
-    # control_sample = control.loc[ : , "350":"2499"].sample(frac = 0.1, random_state = 1)
+    signatures_long["wavelength"] = pandas.to_numeric(signatures_long["wavelength"])
+    signatures_long["value"] = pandas.to_numeric(signatures_long["value"])
     
-    # control_sample_t = control_sample.transpose()
-    # y_min = min(control_sample_t.iloc[ : , 1])
-    # y_max = max(control_sample_t.iloc[ : , 1])
+    y_max = signatures_long["value"].max()
     
-    control["wavelength"] = pandas.to_numeric(control["wavelength"])
-    control["value"] = pandas.to_numeric(control["value"])
-    
-    graph_ctrl = ggplot(control) \
+    graph_signatures = ggplot(signatures_long) \
         + theme(legend_position = "none") \
         + aes(x = "wavelength", y = "value", color = "variable") \
         +labs(
@@ -44,57 +39,18 @@ def ranges_graphics(control, ranges_control):
             title = "ggplot"
             ) 
         
-    # for i in range(len(ranges_control)):
-    #     i_range = []
-    #     for j in range(len(ranges_control[i])):
-    #         graph_ctrl = graph_ctrl + geom_vline(xintercept = ranges_control[i][j], color="black", alpha = 0) 
-    #         i_range.append(ranges_control[i][j])
-    #     graph_ctrl = graph_ctrl + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = 0.0, ymax = 1.0, fill = "steelblue", alpha = 0.1))
-    graph_ctrl = graph_ctrl + geom_line()
+    for i in range(len(ranges)):
+        i_range = []
+        for j in range(len(ranges[i])):
+            # graph_signatures = graph_signatures + geom_vline(xintercept = ranges[i][j], color="black", alpha = 0.2) 
+            i_range.append(ranges[i][j])
+        graph_signatures = graph_signatures + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = 0.0, ymax = y_max), fill = "steelblue", alpha = 0.1, color = None)
+                # + geom_text(aes(x = i_range[0], y = y_max, label = f"({i_range[0]}-{i_range[1]})"), size = 3, color = "black")
+    graph_signatures = graph_signatures + geom_line()
     
-    print(graph_ctrl)
-    graph_ctrl.save(filename = "ranges control Chl")
+    print(graph_signatures)
+    graph_signatures.save(filename = "ranges control Chl")
    
-    # Graphics for water stress set
-    # ws_sample = water_stress.loc[ : , "350":"2499"].sample(frac = 0.1, random_state = 1)
-    
-    # ws_sample_t = ws_sample.transpose()
-    
-    # y_min = min(ws_sample_t.iloc[ : , 1])
-    # y_max = max(ws_sample_t.iloc[ : , 1])
-    
-    # graph_ws = ggplot(ws_sample_t) \
-    #     + aes(x = [i for i in range(350, 2500)], y = ws_sample_t.iloc[ : , 1]) \
-    #     +labs(
-    #         x = "Wavelength (nm)",
-    #         y = "Reflectance %",
-    #         title = "Ranges selected in a spectral signature (standardized)"
-    #         ) 
-        
-    # for i in range(len(ranges_water_stress)):
-    #     i_range = []
-    #     for j in range(len(ranges_water_stress[i])):
-    #         graph_ws = graph_ws + geom_vline(xintercept = ranges_water_stress[i][j], color="black", alpha = 0) 
-    #         i_range.append(ranges_water_stress[i][j])
-    #     graph_ws = graph_ws + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = y_min, ymax = y_max), fill = "steelblue", alpha = 0.1)
-    # graph_ws = graph_ws + geom_line()
-    
-    # print(graph_ws)
-    # graph_ws.save(filename = f"ranges water stress {target}")
-    
-    
-    # using matplotlib
-    plt.plot(control["wavelength"], control["value"])
-    plt.title("matplotlib")
-    plt.xlabel("Wavelength (nm)")
-    plt.ylabel("Reflectance (%)")
-    plt.savefig("graph.png")
-    # plt.grid(True)
-    plt.show()
-    return
-
-def ranges_graphics_matplotlib(target, control, ranges_control, water_stress, ranges_water_stress, year):
-    
     return
 
 # The following functions run each algorithm available and prints their results.
@@ -158,6 +114,8 @@ def run_kbest_mi(target, control, water_stress, year):
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
     control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
     ranges_graphics(control_long, rangos_control)
+    water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
+    ranges_graphics(water_stress_long, rangos_water_stress)
     return
 
 def run_ga(target, control, water_stress, year):
@@ -178,7 +136,7 @@ def run_ga(target, control, water_stress, year):
 def main(argv):
     # default values for line commands
     years_default = [2014, 2015, 2016, 2017]
-    target = 'Chl'
+    target = 'NBI'
     alg = 'kbestmi'
     year = '2014'
     
