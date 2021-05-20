@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import pandas
-from sklearn.preprocessing import StandardScaler
 
 # Data preprocessing for a year given as parameter
 def data_any_year(target, year):
@@ -34,13 +33,6 @@ def data_any_year(target, year):
     # get signature columns, and column names as list
     df_firma_control = filter_control.loc[ : , "350":"2499"]
     cols = list(df_firma_control.columns.values) 
-    
-    # Standardize signature (z-score)
-    # the standard score of the sample x is calculated as:
-    # z = (x - u)/s
-    # where u is the mean of the training samples,
-    # and s is the standard deviation of the training samples
-    # df_firma_control = pandas.DataFrame(StandardScaler().fit_transform(df_firma_control))
     
     # assign column names to dataframe
     df_firma_control.columns = cols

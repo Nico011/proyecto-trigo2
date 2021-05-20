@@ -6,7 +6,7 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 
-from plotnine import ggplot, aes, labs, geom_line, theme, geom_vline, geom_rect, geom_text
+from plotnine import ggplot, aes, labs, geom_line, theme, geom_rect#, geom_vline
 
 import pandas
 import time
@@ -23,12 +23,12 @@ import ranges
 
 
 # Graphics for spectral signatures    
-def ranges_graphics(signatures_long, ranges):
+def ranges_graphics(target, signatures_long, ranges, hydro_state, year, algorithm):
     
     signatures_long["wavelength"] = pandas.to_numeric(signatures_long["wavelength"])
     signatures_long["value"] = pandas.to_numeric(signatures_long["value"])
     
-    y_max = signatures_long["value"].max()
+    y_max = signatures_long["value"].max() + 0.05
     
     graph_signatures = ggplot(signatures_long) \
         + theme(legend_position = "none") \
@@ -45,7 +45,6 @@ def ranges_graphics(signatures_long, ranges):
             # graph_signatures = graph_signatures + geom_vline(xintercept = ranges[i][j], color="black", alpha = 0.2) 
             i_range.append(ranges[i][j])
         graph_signatures = graph_signatures + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = 0.0, ymax = y_max), fill = "steelblue", alpha = 0.1, color = None)
-                # + geom_text(aes(x = i_range[0], y = y_max, label = f"({i_range[0]}-{i_range[1]})"), size = 3, color = "black")
     graph_signatures = graph_signatures + geom_line()
     
     print(graph_signatures)
@@ -113,9 +112,9 @@ def run_kbest_mi(target, control, water_stress, year):
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "kbestmi")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
     control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
-    ranges_graphics(control_long, rangos_control)
+    ranges_graphics(target, control_long, rangos_control, "control", year, "kbestmi")
     water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
-    ranges_graphics(water_stress_long, rangos_water_stress)
+    ranges_graphics(target, water_stress_long, rangos_water_stress, "water stress", year, "kbestmi")
     return
 
 def run_ga(target, control, water_stress, year):

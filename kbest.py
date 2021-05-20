@@ -4,7 +4,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_regression
 from sklearn.feature_selection import mutual_info_regression
-import pandas as pd
+from sklearn.preprocessing import StandardScaler
+import pandas
 import numpy as np
 
 
@@ -19,13 +20,23 @@ def calcular_75_sup(lista_importancia):
 
 
 def kbest_corr(target, dataset):
+    # Standardize signature (z-score)
+    # the standard score of the sample x is calculated as:
+    # z = (x - u)/s
+    # where u is the mean of the training samples,
+    # and s is the standard deviation of the training samples
+    cols = list(dataset.columns.values)
+    signature = dataset.iloc[ : , 1:]
+    signature = pandas.DataFrame(StandardScaler().fit_transform(signature))
+    dataset = pandas.concat([dataset.loc[ : , target].reset_index(drop=True), signature], axis = 1)
+    dataset.columns = cols
     
     # get signature columns
-    firma = dataset.loc[ : , "350":"2499"]
+    signature = dataset[ : , 1:]
     
     my_k = 'all'
     
-    x_train, x_test, y_train, y_test = train_test_split(firma,
+    x_train, x_test, y_train, y_test = train_test_split(signature,
                                                         dataset.loc[:, target],
                                                         test_size=0.33,
                                                         random_state=1)
@@ -43,11 +54,22 @@ def kbest_corr(target, dataset):
     return elegidos 
 
 def kbest_mi(target, dataset):
-    firma = dataset.loc[ : , "350":"2499"]
+    # Standardize signature (z-score)
+    # the standard score of the sample x is calculated as:
+    # z = (x - u)/s
+    # where u is the mean of the training samples,
+    # and s is the standard deviation of the training samples
+    cols = list(dataset.columns.values)
+    signature = dataset.iloc[ : , 1:]
+    signature = pandas.DataFrame(StandardScaler().fit_transform(signature))
+    dataset = pandas.concat([dataset.loc[ : , target].reset_index(drop=True), signature], axis = 1)
+    dataset.columns = cols
+    
+    signature = dataset.iloc[ : , 1:]
     
     my_k = 'all'
     
-    x_train, x_test, y_train, y_test = train_test_split(firma,
+    x_train, x_test, y_train, y_test = train_test_split(signature,
                                                         dataset.loc[:, target],
                                                         test_size=0.33,
                                                         random_state=1)

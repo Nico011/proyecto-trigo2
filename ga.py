@@ -5,6 +5,7 @@ import pandas
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
+from sklearn.preprocessing import StandardScaler
 
 
 model_target = 0.3 # r2 target
@@ -144,8 +145,19 @@ def mutation(population):
 
 # main function
 def ga(target, dataset):
+    # Standardize signature (z-score)
+    # the standard score of the sample x is calculated as:
+    # z = (x - u)/s
+    # where u is the mean of the training samples,
+    # and s is the standard deviation of the training samples
+    cols = list(dataset.columns.values)
+    signature = dataset.iloc[ : , 1:]
+    signature = pandas.DataFrame(StandardScaler().fit_transform(signature))
+    dataset = pandas.concat([dataset.loc[ : , target].reset_index(drop=True), signature], axis = 1)
+    dataset.columns = cols
+    
     global X
-    X = dataset.loc[ : , "350":"2499"]
+    X = dataset.iloc[ : , 1:]
     
     global y
     y = dataset.loc[ : , target]
