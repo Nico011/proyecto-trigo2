@@ -6,9 +6,6 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 
-from plotnine import ggplot, aes, labs, geom_line, theme, geom_rect#, geom_vline
-
-import pandas
 import time
 import sys
 import getopt
@@ -20,37 +17,7 @@ import lasso
 import kbest
 import ga
 import ranges
-
-
-# Graphics for spectral signatures    
-def ranges_graphics(target, signatures_long, ranges, hydro_state, year, algorithm):
-    
-    signatures_long["wavelength"] = pandas.to_numeric(signatures_long["wavelength"])
-    signatures_long["value"] = pandas.to_numeric(signatures_long["value"])
-    
-    y_max = signatures_long["value"].max() + 0.05
-    
-    graph_signatures = ggplot(signatures_long) \
-        + theme(legend_position = "none") \
-        + aes(x = "wavelength", y = "value", color = "variable") \
-        +labs(
-            x = "Wavelength (nm)",
-            y = "Reflectance (%)",
-            title = "ggplot"
-            ) 
-        
-    for i in range(len(ranges)):
-        i_range = []
-        for j in range(len(ranges[i])):
-            # graph_signatures = graph_signatures + geom_vline(xintercept = ranges[i][j], color="black", alpha = 0.2) 
-            i_range.append(ranges[i][j])
-        graph_signatures = graph_signatures + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = 0.0, ymax = y_max), fill = "steelblue", alpha = 0.1, color = None)
-    graph_signatures = graph_signatures + geom_line()
-    
-    print(graph_signatures)
-    graph_signatures.save(filename = "ranges control Chl")
-   
-    return
+import graphics
 
 # The following functions run each algorithm available and prints their results.
 # They all work about the same. They receive as parameters the target (string),
@@ -69,7 +36,10 @@ def run_boruta(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress= ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "boruta")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    # graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
+    control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
+    graphics.ranges_graphics(target, control_long, rangos_control, "control", year, "boruta")
+    water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
+    graphics.ranges_graphics(target, water_stress_long, rangos_water_stress, "water stress", year, "boruta")
     return
 
 def run_lasso(target, control, water_stress, year):
@@ -83,7 +53,10 @@ def run_lasso(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "lasso")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    # graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
+    control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
+    graphics.ranges_graphics(target, control_long, rangos_control, "control", year, "lasso")
+    water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
+    graphics.ranges_graphics(target, water_stress_long, rangos_water_stress, "water stress", year, "lasso")
     return
 
 def run_kbest_corr(target, control, water_stress, year):
@@ -97,7 +70,10 @@ def run_kbest_corr(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "kbestcorr")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    # graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
+    control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
+    graphics.ranges_graphics(target, control_long, rangos_control, "control", year, "kbestcorr")
+    water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
+    graphics.ranges_graphics(target, water_stress_long, rangos_water_stress, "water stress", year, "kbestcorr")
     return
 
 def run_kbest_mi(target, control, water_stress, year):
@@ -112,9 +88,9 @@ def run_kbest_mi(target, control, water_stress, year):
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "kbestmi")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
     control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
-    ranges_graphics(target, control_long, rangos_control, "control", year, "kbestmi")
+    graphics.ranges_graphics(target, control_long, rangos_control, "control", year, "kbestmi")
     water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
-    ranges_graphics(target, water_stress_long, rangos_water_stress, "water stress", year, "kbestmi")
+    graphics.ranges_graphics(target, water_stress_long, rangos_water_stress, "water stress", year, "kbestmi")
     return
 
 def run_ga(target, control, water_stress, year):
@@ -128,14 +104,17 @@ def run_ga(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "water stress", year, "ga")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    # graphics(target, control, rangos_control, water_stress, rangos_water_stress, year)
+    control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
+    graphics.ranges_graphics(target, control_long, rangos_control, "control", year, "ga")
+    water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
+    graphics.ranges_graphics(target, water_stress_long, rangos_water_stress, "water stress", year, "ga")
     return
 
 # Main function
 def main(argv):
     # default values for line commands
     years_default = [2014, 2015, 2016, 2017]
-    target = 'NBI'
+    target = 'Chl'
     alg = 'kbestmi'
     year = '2014'
     
