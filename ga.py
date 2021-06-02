@@ -145,6 +145,9 @@ def mutation(population):
 
 # main function
 def ga(target, dataset):
+    if dataset.shape[0] == 0:
+        return []
+    
     # Standardize signature (z-score)
     # the standard score of the sample x is calculated as:
     # z = (x - u)/s

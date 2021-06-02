@@ -40,13 +40,19 @@ def data_any_year(target, year):
     df_target_water_stress = filter_water_stress.loc[ : , target]
     df_firma_water_stress = filter_water_stress.loc[ : , "350":"2499"]
     
-    # Estandadize water_stress
-    # df_firma_water_stress = pandas.DataFrame(StandardScaler().fit_transform(df_firma_water_stress)) 
     df_firma_water_stress.columns = cols
     
-    # join target column to predictors
-    control = pandas.concat([df_target_control.reset_index(drop=True), df_firma_control], axis = 1)
-    water_stress = pandas.concat([df_target_water_stress.reset_index(drop=True), df_firma_water_stress], axis = 1)
+    # join (horizontaly) target column to predictors
+    control = pandas.concat(
+        [df_target_control.reset_index(drop=True), 
+         df_firma_control.reset_index(drop=True)], 
+        axis = 1
+        )
+    water_stress = pandas.concat(
+        [df_target_water_stress.reset_index(drop=True), 
+         df_firma_water_stress.reset_index(drop=True)], 
+        axis = 1
+        )
     
     # count outliers for control
     # https://stackoverflow.com/questions/39068214/how-to-count-outliers-for-all-columns-in-python

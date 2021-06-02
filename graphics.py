@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from plotnine import ggplot, aes, labs, geom_line, theme, geom_rect#, geom_vline
 import pandas
+import os
 
-
+PLOT_DIR = 'plots'
 # Graphics for spectral signatures    
 def ranges_graphics(target, signatures_long, ranges, hydro_state, year, algorithm):
+    if signatures_long.shape[0] == 0:
+        return
     
     alg = ''
     if algorithm == "boruta":
@@ -30,20 +33,25 @@ def ranges_graphics(target, signatures_long, ranges, hydro_state, year, algorith
         + labs(
             x = "Wavelength (nm)",
             y = "Reflectance (%)",
-            title = f"Ranges in spectral signature - {target}, {year}.",
+            title = f"Ranges in signature: {target} {hydro_state} {alg}, {year}.",
             subtitle = f"{alg}, {hydro_state} set."
             ) 
+    
+    if ranges is not None:
+        for i in range(len(ranges)):
+            i_range = []
+            for j in range(len(ranges[i])):
+                # graph_signatures = graph_signatures + geom_vline(xintercept = ranges[i][j], color="black", alpha = 0.2) 
+                i_range.append(ranges[i][j])
+            graph_signatures = graph_signatures + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = 0.0, ymax = y_max), fill = "steelblue", alpha = 0.1, color = None)
+        graph_signatures = graph_signatures + geom_line()
         
-    for i in range(len(ranges)):
-        i_range = []
-        for j in range(len(ranges[i])):
-            # graph_signatures = graph_signatures + geom_vline(xintercept = ranges[i][j], color="black", alpha = 0.2) 
-            i_range.append(ranges[i][j])
-        graph_signatures = graph_signatures + geom_rect(aes(xmin = i_range[0], xmax = i_range[1], ymin = 0.0, ymax = y_max), fill = "steelblue", alpha = 0.1, color = None)
-    graph_signatures = graph_signatures + geom_line()
+    else:
+        graph_signatures = graph_signatures + geom_line()
     
     print(graph_signatures)
-    graph_signatures.save(filename = f"ranges in signature {target}-{algorithm}-{hydro_state}-{year}")
-   
-    return
+    graph_signatures.save(filename = os.path.join(PLOT_DIR, 
+                                                  f"{year}-{algorithm}-{hydro_state}-ranges-{target}"))
+
+    return 
 

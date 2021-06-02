@@ -13,6 +13,9 @@ def string_to_int(lista):
 # Original algorithm from
 # https://towardsdatascience.com/boruta-explained-the-way-i-wish-someone-explained-it-to-me-4489d70e154a
 def my_boruta_init(target, dataset):
+    if dataset.shape[0] == 0:
+        return []
+    
     # Standardize signature (z-score)
     # the standard score of the sample x is calculated as:
     # z = (x - u)/s

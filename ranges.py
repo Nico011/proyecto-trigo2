@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import copy
 import pandas
+import os
+
+PLOT_DIR = 'plots'
 
 
 
@@ -89,8 +92,8 @@ def rangos_clustering(target, selected, state, year, alg):
     # plt.xlim(350, 2500)
     bp.xaxis.set_major_locator(MaxNLocator(integer = True))
     plt.yticks([i + 1 for i in range(tot_clusters)], rngs)
-    plt.title(f"Boxplot {target}-{state}, {year}")
-    plt.savefig(f"{target}-{alg}-{state}-{year}.png")  
+    plt.title(f"Clusters {target}-{state}-{alg}, {year}")
+    plt.savefig(os.path.join(PLOT_DIR, f"{year}-{alg}-{state}-clusters-{target}.png"))  
     plt.show()
     
     # return the sorted list of ranges

@@ -20,6 +20,9 @@ def calcular_75_sup(lista_importancia):
 
 
 def kbest_corr(target, dataset):
+    if dataset.shape[0] == 0:
+        return []
+    
     # Standardize signature (z-score)
     # the standard score of the sample x is calculated as:
     # z = (x - u)/s
@@ -32,7 +35,7 @@ def kbest_corr(target, dataset):
     dataset.columns = cols
     
     # get signature columns
-    signature = dataset[ : , 1:]
+    signature = dataset.iloc[ : , 1:]
     
     my_k = 'all'
     
@@ -54,6 +57,9 @@ def kbest_corr(target, dataset):
     return elegidos 
 
 def kbest_mi(target, dataset):
+    if dataset.shape[0] == 0:
+        return []
+    
     # Standardize signature (z-score)
     # the standard score of the sample x is calculated as:
     # z = (x - u)/s
