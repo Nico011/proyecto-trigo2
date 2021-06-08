@@ -21,6 +21,8 @@ import ranges
 import graphics
 import pdf_report
 
+import pls
+
 # directory to save plots
 PLOT_DIR = 'plots'
 
@@ -105,10 +107,11 @@ def run_kbest_corr(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "ws", year, "kbestcorr")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
-    graphics.ranges_graphics(target, control_long, rangos_control, "control", year, "kbestcorr")
-    water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
-    graphics.ranges_graphics(target, water_stress_long, rangos_water_stress, "ws", year, "kbestcorr")
+    # control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
+    # graphics.ranges_graphics(target, control_long, rangos_control, "control", year, "kbestcorr")
+    # water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
+    # graphics.ranges_graphics(target, water_stress_long, rangos_water_stress, "ws", year, "kbestcorr")
+    pls.pls_full_spectrum(target, control)
     return
 
 def run_kbest_mi(target, control, water_stress, year):

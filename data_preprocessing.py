@@ -14,6 +14,11 @@ def data_any_year(target, year):
     # get_content = requests.get(url).content
     # data = pandas.read_csv(io.StringIO(get_content.decode('ISO-8859-1')), 
     #                        header = 0, delimiter = ";", encoding = 'ISO-8859-1')
+    
+    # Read xlsx
+    # xl_file = pandas.ExcelFile("Datos trigo CLIP SR-CAU.xlsx")
+    # data = {sheet_name: xl_file.parse(sheet_name)
+    #         for sheet_name in xl_file.sheet_names}
    
     # possible filters:
     # Fenologia != antesis

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from plotnine import ggplot, aes, labs, geom_line, theme, geom_rect#, geom_vline
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas
 import os
 
@@ -55,3 +57,15 @@ def ranges_graphics(target, signatures_long, ranges, hydro_state, year, algorith
 
     return 
 
+def plot_rages(target, signatures, ranges, hydro_state, year, algorithm):
+    with plt.style.context('ggplot'):
+        xticks = np.arange(350, 2500)
+        plt.plot(xticks, signatures.iloc[0:20 , 1: ].T)
+        
+        plt.xlabel('Wavelengths (nm)')
+        # plt.xticks = xticks
+        plt.ylabel("Reflectance (%)")
+        plt.title('Spectral signatures')
+        
+        plt.show()
+    return
