@@ -20,11 +20,11 @@ def rangos_clustering(target, selected, state, year, alg):
     # returns nothing when list is empty
     if len(selected) == 0:
         print("None")
-        return
+        return []
     
     # returns one range when list has one value
     if len(selected) == 1:
-        return [(selected, selected)]
+        return [(selected[0], selected[0])]
     
     # create a list with every wavelength selected as a pair with itself in 
     # another list and cast it to pandas array
@@ -57,26 +57,25 @@ def rangos_clustering(target, selected, state, year, alg):
     
     # Sort list in ascending order
     clustered_index = sorted(clustered_index)
-    # print(f"clustered_index2: {clustered_index}")
     
-    print("Clusters summary:")
+    # print("Clusters summary:")
     # Copy list to replace index with value, and
     # print each cluster with statistics (count, mean, std, min and max)
     wavelen_clustered = copy.deepcopy(clustered_index)
     for i in range(len(clustered_index)):
         for j in range(len(clustered_index[i])):
             wavelen_clustered[i][j] = selected[clustered_index[i][j]]
-        print(f"Cluster {i+1:}")
-        aux_cluster = pandas.Series(wavelen_clustered[i])
-        statistics = [["count", aux_cluster.count()],
-                      ["mean", aux_cluster.mean()],
-                      ["median", aux_cluster.median()],
-                      ["std", aux_cluster.std()],
-                      ["min", aux_cluster.min()],
-                      ["max", aux_cluster.max()]]
-        print(f"{wavelen_clustered[i]}")
-        print(pandas.DataFrame(statistics, index = ["", "", "", "", "", ""], columns = ["", ""]))
-        print("")
+        # print(f"Cluster {i+1:}")
+        # aux_cluster = pandas.Series(wavelen_clustered[i])
+        # statistics = [["count", aux_cluster.count()],
+        #               ["mean", aux_cluster.mean()],
+        #               ["median", aux_cluster.median()],
+        #               ["std", aux_cluster.std()],
+        #               ["min", aux_cluster.min()],
+        #               ["max", aux_cluster.max()]]
+        # print(f"{wavelen_clustered[i]}")
+        # print(pandas.DataFrame(statistics, index = ["", "", "", "", "", ""], columns = ["", ""]))
+        # print("")
         
     # create a new list, then for each list of indexes replace min and max for
     # the data value to express it as a range.
@@ -93,7 +92,7 @@ def rangos_clustering(target, selected, state, year, alg):
     bp.xaxis.set_major_locator(MaxNLocator(integer = True))
     plt.yticks([i + 1 for i in range(tot_clusters)], rngs)
     plt.title(f"Clusters {target}-{state}-{alg}, {year}")
-    plt.savefig(os.path.join(PLOT_DIR, f"{year}-{alg}-{state}-clusters-{target}.png"))  
+    plt.savefig(os.path.join(PLOT_DIR, f"{state}-{year}-{alg}-clusters-{target}.png"))  
     plt.show()
     
     # return the sorted list of ranges

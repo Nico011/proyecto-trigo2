@@ -8,7 +8,7 @@ import os
 PLOT_DIR = 'plots'
 # Graphics for spectral signatures    
 def ranges_graphics(target, signatures_long, ranges, hydro_state, year, algorithm):
-    if signatures_long.shape[0] == 0:
+    if ranges is None:
         return
     
     alg = ''
@@ -53,7 +53,7 @@ def ranges_graphics(target, signatures_long, ranges, hydro_state, year, algorith
     
     print(graph_signatures)
     graph_signatures.save(filename = os.path.join(PLOT_DIR, 
-                                                  f"{year}-{algorithm}-{hydro_state}-ranges-{target}"))
+                                                  f"{hydro_state}-{year}-{algorithm}-ranges-{target}"))
 
     return 
 

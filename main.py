@@ -21,7 +21,8 @@ import ranges
 import graphics
 import pdf_report
 
-import pls
+# import pls
+import svregression
 
 # directory to save plots
 PLOT_DIR = 'plots'
@@ -73,10 +74,34 @@ def run_boruta(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress= ranges.rangos_clustering(target, elegidos_water_stress, "ws", year, "boruta")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
-    graphics.ranges_graphics(target, control_long, rangos_control, "control", year, "boruta")
-    water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
-    graphics.ranges_graphics(target, water_stress_long, rangos_water_stress, "ws", year, "boruta")
+    # control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
+    # graphics.ranges_graphics(target, control_long, rangos_control, "control", year, "boruta")
+    # water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
+    # graphics.ranges_graphics(target, water_stress_long, rangos_water_stress, "ws", year, "boruta")
+    
+    # Control group SVR
+    selected_dataframe_control, ranges_dataframe_control = data_preprocessing.selected_or_ranges_to_dataset(elegidos_control, rangos_control, control, target)
+    
+    print("Control group")
+    svregression.svr(target, control)
+    
+    print("Wavelengths selected as important (control group)")
+    svregression.svr(target, selected_dataframe_control)
+    
+    print("Wavelength in ranges (control group)")
+    svregression.svr(target, ranges_dataframe_control)
+    
+    # WS group SVR
+    selected_dataframe_ws, ranges_dataframe_ws = data_preprocessing.selected_or_ranges_to_dataset(elegidos_water_stress, rangos_water_stress, water_stress, target)
+    
+    print("Water stress group")
+    svregression.svr(target, water_stress)
+    
+    print("Wavelengths selected as important (water stress group)")
+    svregression.svr(target, selected_dataframe_ws)
+    
+    print("Wavelength in ranges (water_stress group)")
+    svregression.svr(target, ranges_dataframe_ws)
     return
 
 def run_lasso(target, control, water_stress, year):
@@ -90,10 +115,34 @@ def run_lasso(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "ws", year, "lasso")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
-    graphics.ranges_graphics(target, control_long, rangos_control, "control", year, "lasso")
-    water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
-    graphics.ranges_graphics(target, water_stress_long, rangos_water_stress, "ws", year, "lasso")
+    # control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
+    # graphics.ranges_graphics(target, control_long, rangos_control, "control", year, "lasso")
+    # water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
+    # graphics.ranges_graphics(target, water_stress_long, rangos_water_stress, "ws", year, "lasso")
+    
+    # Control group SVR
+    selected_dataframe_control, ranges_dataframe_control = data_preprocessing.selected_or_ranges_to_dataset(elegidos_control, rangos_control, control, target)
+    
+    print("Control group")
+    svregression.svr(target, control)
+    
+    print("Wavelengths selected as important (control group)")
+    svregression.svr(target, selected_dataframe_control)
+    
+    print("Wavelength in ranges (control group)")
+    svregression.svr(target, ranges_dataframe_control)
+    
+    # WS group SVR
+    selected_dataframe_ws, ranges_dataframe_ws = data_preprocessing.selected_or_ranges_to_dataset(elegidos_water_stress, rangos_water_stress, water_stress, target)
+    
+    print("Water stress group")
+    svregression.svr(target, water_stress)
+    
+    print("Wavelengths selected as important (water stress group)")
+    svregression.svr(target, selected_dataframe_ws)
+    
+    print("Wavelength in ranges (water_stress group)")
+    svregression.svr(target, ranges_dataframe_ws)
     return
 
 def run_kbest_corr(target, control, water_stress, year):
@@ -107,11 +156,35 @@ def run_kbest_corr(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "ws", year, "kbestcorr")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
+    
     # control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
     # graphics.ranges_graphics(target, control_long, rangos_control, "control", year, "kbestcorr")
     # water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
     # graphics.ranges_graphics(target, water_stress_long, rangos_water_stress, "ws", year, "kbestcorr")
-    pls.pls_full_spectrum(target, control)
+    
+    # Control group SVR
+    selected_dataframe_control, ranges_dataframe_control = data_preprocessing.selected_or_ranges_to_dataset(elegidos_control, rangos_control, control, target)
+    
+    print("Control group")
+    svregression.svr(target, control)
+    
+    print("Wavelengths selected as important (control group)")
+    svregression.svr(target, selected_dataframe_control)
+    
+    print("Wavelength in ranges (control group)")
+    svregression.svr(target, ranges_dataframe_control)
+    
+    # WS group SVR
+    selected_dataframe_ws, ranges_dataframe_ws = data_preprocessing.selected_or_ranges_to_dataset(elegidos_water_stress, rangos_water_stress, water_stress, target)
+    
+    print("Water stress group")
+    svregression.svr(target, water_stress)
+    
+    print("Wavelengths selected as important (water stress group)")
+    svregression.svr(target, selected_dataframe_ws)
+    
+    print("Wavelength in ranges (water_stress group)")
+    svregression.svr(target, ranges_dataframe_ws)
     return
 
 def run_kbest_mi(target, control, water_stress, year):
@@ -125,10 +198,34 @@ def run_kbest_mi(target, control, water_stress, year):
     print(f"Selected water stress: {len(elegidos_water_stress)} wavelength(s)\n{elegidos_water_stress}")
     rangos_water_stress = ranges.rangos_clustering(target, elegidos_water_stress, "ws", year, "kbestmi")
     print(f"Selected wavelength ranges (water stress set): {rangos_water_stress}")
-    control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
-    graphics.ranges_graphics(target, control_long, rangos_control, "control", year, "kbestmi")
-    water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
-    graphics.ranges_graphics(target, water_stress_long, rangos_water_stress, "ws", year, "kbestmi")
+    # control_long = data_preprocessing.wide_to_long(control.iloc[ : , 1:])
+    # graphics.ranges_graphics(target, control_long, rangos_control, "control", year, "kbestmi")
+    # water_stress_long = data_preprocessing.wide_to_long(water_stress.iloc[ : , 1:])
+    # graphics.ranges_graphics(target, water_stress_long, rangos_water_stress, "ws", year, "kbestmi")
+    
+    # Control group SVR
+    selected_dataframe_control, ranges_dataframe_control = data_preprocessing.selected_or_ranges_to_dataset(elegidos_control, rangos_control, control, target)
+    
+    print("Control group")
+    svregression.svr(target, control)
+    
+    print("Wavelengths selected as important (control group)")
+    svregression.svr(target, selected_dataframe_control)
+    
+    print("Wavelength in ranges (control group)")
+    svregression.svr(target, ranges_dataframe_control)
+    
+    # WS group SVR
+    selected_dataframe_ws, ranges_dataframe_ws = data_preprocessing.selected_or_ranges_to_dataset(elegidos_water_stress, rangos_water_stress, water_stress, target)
+    
+    print("Water stress group")
+    svregression.svr(target, water_stress)
+    
+    print("Wavelengths selected as important (water stress group)")
+    svregression.svr(target, selected_dataframe_ws)
+    
+    print("Wavelength in ranges (water_stress group)")
+    svregression.svr(target, ranges_dataframe_ws)
     return
 
 def run_ga(target, control, water_stress, year):
@@ -154,7 +251,7 @@ def main(argv):
     years_default = [2014, 2015, 2016, 2017]
     target = 'Chl'
     alg = 'kbestcorr'
-    year = '2016'
+    year = '2014'
     
     str_help = """Usage:
 main.py -t <target> [-a <algorithm> -y <year>]
@@ -163,8 +260,8 @@ main.py -t <target> [-a <algorithm> -y <year>]
 -a, --algorithm : Give a specific feature selection algorithm (Optional, default: all).
 -y, --year      : Give a specific year (Optional, default: all).
 
-Targets available: Chl, Flav, Anth, NBI, Pot.Hoja(Bar), Transmitted, 
-                   LAI, EVAP, GS, PN, CI, VPD.
+Targets available: Chl, Flav, Anth, NBI, Pot.Hoja(Bar),
+                   EVAP, GS, PN, CI, VPD.
 
 Algorithms available: 
     boruta     : Run Boruta feature selection algorithm.
@@ -248,9 +345,9 @@ Years available: 2014, 2015, 2016 and 2017."""
             run_boruta(target, control, water_stress, years_default[i])
             print("")
             run_lasso(target, control, water_stress, years_default[i])
-            print("")
-            run_ga(target, control, water_stress, years_default[i])
-            print("")
+            # print("")
+            # run_ga(target, control, water_stress, years_default[i])
+            # print("")
             end = time.perf_counter()
             time_total = time_total + (end - start)
         print(f"Execution time: {time_total:0.2f} seconds.")
@@ -261,7 +358,7 @@ Years available: 2014, 2015, 2016 and 2017."""
         pdf.print_page(p)
     
     pdf.output(f'report-{target}.pdf', 'F')
-    print(f"Boxplot and graphs saved as image in current working directory ({os.getcwd()})")
+    print(f"Boxplot and graphs saved as image in current working directory ({os.getcwd()}/plots)")
 
 if __name__ == "__main__":
     main(sys.argv[1:])

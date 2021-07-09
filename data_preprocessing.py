@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pandas
+import numpy
 
 # Data preprocessing for a year given as parameter
 def data_any_year(target, year):
@@ -100,3 +101,42 @@ def wide_to_long(wide_dataset):
         )
     
     return long_dataset
+
+
+# This function converts a list of selected wavelengths (from feature selection
+# algorithms) to a dataframe with only selected columns. This also converts 
+# ranges (from ranges function) to a dataframe with only the columns between
+# ranges.
+def selected_or_ranges_to_dataset(selected, ranges, whole_dataset, target):
+    
+    if len(ranges) == 1:
+        ranges_dataframe = whole_dataset[[target, str(ranges[0][0])]]
+    
+    elif len(ranges) > 1:
+        ranges_list = [[target]]
+        for r in ranges:
+            ranges_list.append(list(range(r[0], r[1] + 1)))
+            
+        # 2D list to 1D list
+        ranges_list = list(numpy.concatenate(ranges_list).flat)
+        # ints to strs
+        ranges_list = [str(int) for int in ranges_list]
+        
+        # select columns in dataset
+        ranges_dataframe = whole_dataset[ranges_list]
+    else:
+        ranges_dataframe = None
+            
+
+    if len(selected) != 0:
+        sel = [target] + [str(i) for i in selected]
+        selected_dataframe = whole_dataset[sel]
+    else:
+        selected_dataframe = None
+        
+    
+    
+    return selected_dataframe, ranges_dataframe
+
+
+
